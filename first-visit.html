@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ray's First Visit — DPHT 7441 Module 5</title>
+<style>
+  :root{ --navy:#012D46; --teal:#00778B; --ink:#1F2933; --muted:#5A6570;
+    --line:#D7DDE2; --tint:#F2F6F8; --tint2:#E8EFF2; --bg:#FFFFFF; --panel:#FFFFFF;
+    --g:#1B7F4B; --gbg:#E6F2EA; --y:#9A6700; --ybg:#FBF2DF; --r:#B3261E; --rbg:#FBEAE8; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --navy:#8FC6DA; --teal:#4FB3C7; --ink:#E8EDF1; --muted:#9BA7B2;
+      --line:#2A3946; --tint:#16222C; --tint2:#1B2A36; --bg:#0E171F; --panel:#13202A;
+      --gbg:#14301F; --ybg:#31270F; --rbg:#37191A; --g:#6ED08F; --y:#E2B44C; --r:#F09189; } }
+  :root[data-theme="dark"]{ --navy:#8FC6DA; --teal:#4FB3C7; --ink:#E8EDF1; --muted:#9BA7B2;
+    --line:#2A3946; --tint:#16222C; --tint2:#1B2A36; --bg:#0E171F; --panel:#13202A;
+    --gbg:#14301F; --ybg:#31270F; --rbg:#37191A; --g:#6ED08F; --y:#E2B44C; --r:#F09189; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",Calibri,system-ui,-apple-system,sans-serif;line-height:1.5}
+  .wrap{max-width:860px;margin:0 auto;padding:24px 18px 80px}
+  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+  .kick{font-size:11px;font-weight:700;letter-spacing:1.1px;color:var(--teal);text-transform:uppercase}
+  h1{font-size:25px;color:var(--navy);margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px}
+  .bar{display:flex;gap:6px;margin:16px 0 20px}
+  .step{flex:1;padding:7px 6px;border-radius:6px;background:var(--tint);border:1px solid var(--line);
+    font-size:11px;font-weight:700;color:var(--muted);text-align:center}
+  .step.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .step.done{background:var(--tint2);color:var(--teal)}
+  h2{font-size:20px;color:var(--navy);margin:0 0 10px}
+  .task{background:var(--navy);color:#fff;border-radius:8px;padding:14px 16px;margin:0 0 14px}
+  .task p{margin:0;font-size:16px;font-weight:600}
+  .task .small{font-weight:400;font-size:13px;opacity:.85;margin-top:6px}
+  .vig{background:var(--tint);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:16px}
+  .vig h3{margin:0 0 8px;font-size:11px;letter-spacing:.9px;color:var(--teal);text-transform:uppercase}
+  .vig p{margin:0 0 7px;font-size:14px} .vig p:last-child{margin:0}
+  textarea{width:100%;font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);
+    border-radius:7px;padding:11px 12px;min-height:120px;resize:vertical;margin-bottom:9px}
+  textarea:focus{outline:none;border-color:var(--teal)}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:12px 14px;margin-bottom:9px;cursor:pointer;font:inherit;color:inherit;font-weight:600}
+  .opt:hover{border-color:var(--teal)}
+  .opt[aria-pressed="true"]{border-color:var(--navy);background:var(--tint);border-width:2px}
+  .meta{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .act{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button.go{background:var(--navy);color:#fff;border:0;border-radius:7px;padding:11px 20px;font:inherit;font-weight:600;cursor:pointer}
+  button.go[disabled]{background:var(--muted);cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--teal);border:1px solid var(--line)}
+  .sumsec{margin-bottom:20px}
+  .sumsec h3{font-size:14px;color:var(--navy);margin:0 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .sumrow{padding:10px 12px;border-radius:7px;margin-bottom:7px;font-size:14px}
+  .sumrow.g{background:var(--gbg)} .sumrow.y{background:var(--ybg)} .sumrow.r{background:var(--rbg)}
+  .sumrow.n{background:var(--tint)}
+  .sumrow .why{display:block;margin-top:5px;font-size:13px;opacity:.92}
+  .yours{background:var(--tint2);border-left:3px solid var(--teal);border-radius:0 7px 7px 0;
+    padding:12px 14px;margin-bottom:10px;font-size:15px;white-space:pre-wrap}
+  .disc{background:var(--navy);color:#fff;border-radius:8px;padding:15px 17px;margin:18px 0}
+  .disc h3{margin:0 0 8px;font-size:12px;letter-spacing:.9px;text-transform:uppercase;color:#7FC4D6}
+  .disc ul{margin:0;padding-left:18px} .disc li{margin-bottom:6px;font-size:14px}
+  footer{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  @media print{.act,.bar,footer{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kick">DPHT 7441 &nbsp;|&nbsp; Module 5 &nbsp;|&nbsp; Sync Session 2</div>
+  <h1>Ray's First Visit</h1>
+  <div class="sub">What does he leave with today, and why that rather than something else. Principles only — technique and dosage are the virtual lab.</div>
+</header>
+<div class="bar" id="bar"></div>
+<main id="stage" aria-live="polite"></main>
+<footer>Nothing is saved or submitted. Print or screenshot your summary for the discussion.</footer>
+</div>
+
+<script>
+const GIVE = [
+  { t:"g", lab:"An explanation of what is going on, in his words",
+    why:"His fear-avoidance work subscale is 22, which is above the threshold used in the manipulation rule and predicts a slower course. Education here is aimed at a measured impairment, not offered as a courtesy. It is also free and it works on the first visit." },
+  { t:"g", lab:"Loading in the direction that centralized him",
+    why:"The matched intervention for his subgroup, and directional preference exercise carries a Grade A recommendation. Extension because extension is what centralized him — if flexion had, flexion would be the prescription." },
+  { t:"g", lab:"A plan for the positions that provoke him during a shift",
+    why:"His single largest exposure is sitting in a van, and sitting is his primary aggravating factor. Changing the eight hours he spends provoking himself does more than anything you do in the clinic." },
+  { t:"y", lab:"A manual therapy adjunct to make the exercise tolerable",
+    why:"Reasonable, and secondary. Manual therapy opens a window for the active work here rather than being the treatment. If the press-up centralizes him in the clinic without it, you may not need it today." },
+  { t:"y", lab:"Baseline outcome measures recorded",
+    why:"Necessary, and it is not something he leaves with. Oswestry 34%, pain 6 of 10, fear-avoidance 22 and a great toe extensor at 4 out of 5 are the numbers you will re-measure against." },
+  { t:"r", lab:"A general core strengthening program",
+    why:"Not advised today. He is not the stabilization subgroup, and core work commonly introduces flexion, which is the direction that peripheralizes him. It becomes appropriate later, once the directional response is stable." },
+  { t:"r", lab:"Advice to rest until the symptoms settle",
+    why:"Not advised. Rest does not speed recovery in this presentation and it confirms the belief that his back is fragile. His fear-avoidance score is already elevated and this makes it worse." },
+  { t:"r", lab:"A referral for imaging",
+    why:"Not advised. He has no red flags and a static, mild motor deficit. Imaging at three weeks would not change what you do and is associated with more downstream care." }
+];
+
+const AVOID = [
+  { t:"g", lab:"Thrust manipulation",
+    why:"Correct. He fails both factors of the two-factor pragmatic rule — over 16 days, and symptoms distal to the knee. Say it as a matching decision rather than a contraindication: manipulation is Grade A for low back pain generally, and he is simply not the patient the rule identifies." },
+  { t:"g", lab:"Flexion-based exercise",
+    why:"Correct, and arguably the more important answer. Flexion is the direction that peripheralizes him, so this actively undoes the gain from the extension work. It is the most common way a good plan goes wrong in week one." },
+  { t:"y", lab:"Traction",
+    why:"Defensible. He centralizes, so he is not the traction subgroup, and mechanical traction carries a Grade D recommendation for chronic low back pain with leg pain. It ranks below the two above it because nobody was likely to reach for it." },
+  { t:"r", lab:"Neural mobilization",
+    why:"Not the answer. His presentation is nerve root and leg pain, and neural mobilization is the taught adjunct for exactly that — sliders while he is irritable. Ruling it out removes something that is indicated." },
+  { t:"r", lab:"Nothing — everything on the list is reasonable",
+    why:"Not advised. Two items on that list run directly against his classification. A plan with no exclusions usually means the classification was not used to make it." }
+];
+
+let si=0, sentence="", give=[], avoid=[];
+const STEPS=[{k:"case",lab:"The case"},{k:"say",lab:"What you say"},
+             {k:"give",lab:"What he leaves with"},{k:"avoid",lab:"What you avoid"},{k:"sum",lab:"Summary"}];
+const bar=document.getElementById('bar'), stage=document.getElementById('stage');
+const sh=a=>{const o=a.slice();for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]];}return o;};
+const GIVE_S=sh(GIVE), AVOID_S=sh(AVOID);
+
+function drawBar(){
+  bar.innerHTML='';
+  STEPS.forEach((s,i)=>{const d=document.createElement('div');
+    d.className='step'+(i===si?' on':(i<si?' done':''));d.textContent=s.lab;bar.appendChild(d);});
+}
+function next(label, ok){
+  const a=document.createElement('div');a.className='act';
+  const b=document.createElement('button');b.className='go';b.id='nx';b.textContent=label;b.disabled=(ok===false);
+  b.onclick=()=>{si++;render();window.scrollTo(0,0);};a.appendChild(b);
+  if(si>0){const k=document.createElement('button');k.className='go ghost';k.textContent='Back';
+    k.onclick=()=>{si--;render();window.scrollTo(0,0);};a.appendChild(k);}
+  stage.appendChild(a);return b;
+}
+function render(){
+  drawBar();stage.innerHTML='';
+  const k=STEPS[si].k;
+  if(k==='case') return renderCase();
+  if(k==='say') return renderSay();
+  if(k==='give') return renderPick(GIVE_S,'give',3,'What does he leave with today?','Three items. Principles, not protocols — no sets and reps.');
+  if(k==='avoid') return renderPick(AVOID_S,'avoid',1,'Name the one thing you will NOT do.','This is where the classification shows. Choose the exclusion you would defend.');
+  return renderSum();
+}
+function renderCase(){
+  const h=document.createElement('h2');h.textContent='Where you are';stage.appendChild(h);
+  const v=document.createElement('div');v.className='vig';
+  v.innerHTML='<h3>Ray Torres, 38 — after the examination</h3>'+
+    '<p><b>PT diagnosis.</b> Right L5 radiculopathy with a directional preference for extension. Great toe extensor 4 out of 5, reduced light touch over the L5 dermatome, positive straight leg raise and slump.</p>'+
+    '<p><b>Classification.</b> Acute low back pain with radiating pain. Treatment-based classification: specific exercise, directional preference for extension.</p>'+
+    '<p><b>Baselines.</b> Oswestry 34%. Pain 6 of 10 at worst. Fear-avoidance work subscale 22.</p>'+
+    '<p><b>What he says.</b> He is off work, worried he will not get back, and he thinks he has "done a disc."</p>';
+  stage.appendChild(v);
+  next('Begin');
+}
+function renderSay(){
+  const h=document.createElement('h2');h.textContent='What you say to him';stage.appendChild(h);
+  const t=document.createElement('div');t.className='task';
+  t.innerHTML='<p>He believes he has done a disc. Write the actual sentence you would say.</p>'+
+    '<p class="small">Not the topic. The words. If it would not survive being said out loud to a 38-year-old delivery driver, it is not the sentence.</p>';
+  stage.appendChild(t);
+  const ta=document.createElement('textarea');ta.value=sentence;
+  ta.placeholder='"Ray, ..."';
+  ta.oninput=()=>{sentence=ta.value;b.disabled=!sentence.trim();};
+  stage.appendChild(ta);
+  const b=next('Continue', !!sentence.trim());
+}
+function renderPick(items,key,need,title,hint){
+  const arr = key==='give'?give:avoid;
+  const h=document.createElement('h2');h.textContent=title;stage.appendChild(h);
+  const t=document.createElement('div');t.className='task';
+  t.innerHTML='<p>'+title+'</p><p class="small">'+hint+'</p>';stage.appendChild(t);
+  const m=document.createElement('p');m.className='meta';m.id='c';stage.appendChild(m);
+  items.forEach((it,idx)=>{
+    const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=it.lab;
+    b.setAttribute('aria-pressed',arr.includes(idx)?'true':'false');
+    b.onclick=()=>{const at=arr.indexOf(idx);
+      if(at>=0){arr.splice(at,1);b.setAttribute('aria-pressed','false');}
+      else{if(arr.length>=need)return;arr.push(idx);b.setAttribute('aria-pressed','true');}
+      cnt();};
+    stage.appendChild(b);
+  });
+  const go=next(key==='avoid'?'See summary':'Continue', arr.length>=need);
+  function cnt(){document.getElementById('c').textContent=arr.length+' of '+need+' selected';
+    go.disabled=arr.length<need;}
+  cnt();
+}
+function renderSum(){
+  stage.innerHTML='';
+  const h=document.createElement('h2');h.textContent='Your first visit';stage.appendChild(h);
+  const sec=(t,n)=>{const d=document.createElement('div');d.className='sumsec';
+    const x=document.createElement('h3');x.textContent=t;d.appendChild(x);d.appendChild(n);stage.appendChild(d);};
+  const s1=document.createElement('div');s1.className='yours';s1.textContent=sentence;
+  sec('The sentence you would say', s1);
+  const note=document.createElement('div');note.className='sumrow n';
+  note.innerHTML='<b>There is no scoring on that sentence</b><span class="why">A good one is plain, specific and true: nothing in his history or examination points to a disc, backs are not fragile, and the movements he is avoiding are the ones that rebuild his tolerance. Avoid bulging, degeneration, wear and tear, out of place, and unstable. His mother is not in this case, but his belief is — careless structural language lands on a prepared fear.</span>';
+  stage.appendChild(note);
+  [['What he leaves with', GIVE_S, give],['What you will not do', AVOID_S, avoid]].forEach(([title,items,picks])=>{
+    const d=document.createElement('div');
+    picks.forEach(i=>{const it=items[i];const r=document.createElement('div');r.className='sumrow '+it.t;
+      r.innerHTML='<b>'+it.lab+'</b><span class="why">'+it.why+'</span>';d.appendChild(r);});
+    const missed=items.map((it,i)=>({it,i})).filter(o=>o.it.t==='g'&&!picks.includes(o.i));
+    if(missed.length){const r=document.createElement('div');r.className='sumrow n';
+      r.innerHTML='<b>Strong choices you did not take</b><span class="why">'+
+        missed.map(o=>o.it.lab).join(' &nbsp;·&nbsp; ')+'</span>';d.appendChild(r);}
+    sec(title,d);
+  });
+  const disc=document.createElement('div');disc.className='disc';
+  disc.innerHTML='<h3>Bring these back to the group</h3><ul>'+
+    '<li>Read your sentence out loud. Would you say it to him in those words?</li>'+
+    '<li>Which of your three items would you drop if you only had ten minutes with him?</li>'+
+    '<li>What would have to change for the thing you excluded to become appropriate?</li>'+
+    '<li>Everything here is a category. The virtual lab takes it to technique, grade and dosage.</li></ul>';
+  stage.appendChild(disc);
+  const a=document.createElement('div');a.className='act';
+  const p=document.createElement('button');p.className='go';p.textContent='Print or save';p.onclick=()=>window.print();a.appendChild(p);
+  const r=document.createElement('button');r.className='go ghost';r.textContent='Start over';
+  r.onclick=()=>{si=0;sentence="";give=[];avoid=[];render();window.scrollTo(0,0);};a.appendChild(r);
+  stage.appendChild(a);
+}
+render();
+</script>
+</body>
+</html>
