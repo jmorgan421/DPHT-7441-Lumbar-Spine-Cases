@@ -87,9 +87,10 @@
 <div class="bar" id="bar"></div>
 <main id="stage" aria-live="polite"></main>
 
+<p style="font-size:13px;color:var(--muted);margin:14px 0 0">When everyone is back we will talk through your choices and the three interpretation questions together.</p>
 <footer>
   Choices are tiered as strong, acceptable, or not advised. Tiers stay hidden until the summary.
-  Nothing is saved or submitted.
+  Nothing is saved, submitted, or graded.
 </footer>
 </div>
 
@@ -108,7 +109,7 @@ const CASE = {
           res:"Repeated extension in standing abolishes the calf symptoms and the change is maintained. Repeated flexion returns them to the calf.",
           why:"The strongest first move. A directional response reorganizes every hypothesis below it, and it is the finding that separates the specific exercise subgroup from traction. It is also non-provocative, so it does not compromise anything performed afterward." },
         { t:"g", lab:"Lower quarter neurological screen",
-          res:"Great toe extension 4 out of 5 on the right. Reduced light touch over the dorsum of the foot and the great toe web space. Patellar and Achilles reflexes 2+ and symmetric.",
+          res:"Great toe extension 4 out of 5 on the right. Reduced light touch over the dorsum of the foot. Patellar and Achilles reflexes 2+ and symmetric.",
           why:"Equally defensible. It is the only outstanding screening item, and finding a deficit after an hour of provocation testing is finding it too late. If he had a progressive deficit, everything downstream would change." },
         { t:"g", lab:"Observation and lumbar active range of motion with overpressure",
           res:"Sits shifted off the right buttock and moves slowly from sit to stand. No lateral shift. Flexion limited about 40% and reproduces the calf and foot pain. Extension limited about 25% and EASES the leg pain.",
@@ -133,11 +134,11 @@ const CASE = {
           res:"Repeated extension in standing abolishes the calf symptoms and the change is maintained. Repeated flexion returns them to the calf.",
           why:"Determines the classification on a single finding, and the direction it identifies becomes the treatment. Nothing else you can do today carries this much weight." },
         { t:"g", lab:"Lower quarter neurological screen",
-          res:"Great toe extension 4 out of 5 on the right. Reduced light touch over the dorsum of the foot and the great toe web space. Patellar and Achilles reflexes 2+ and symmetric.",
+          res:"Great toe extension 4 out of 5 on the right. Reduced light touch over the dorsum of the foot. Patellar and Achilles reflexes 2+ and symmetric.",
           why:"Closes the outstanding screen and changes the monitoring plan. He reported numbness, not weakness — patients frequently cannot detect a 4 out of 5, which is why this has to be tested rather than asked." },
         { t:"g", lab:"Straight leg raise with structural differentiation",
           res:"Positive on the right at approximately 40 degrees, reproducing calf and foot symptoms. Ankle dorsiflexion increases them.",
-          why:"Between 30 and 70 degrees the straight leg raise loads L4 to S2, which matches his distribution. It is a sensitive test, so its real power is in a negative — his positive is consistent rather than confirmatory. Adding a structural differentiation is what separates neural from hamstring." },
+          why:"The straight leg raise loads the lower lumbar roots, and reproducing his calf and foot symptoms between 30 and 70 degrees fits his distribution. It is a sensitive test, so its real power is in a negative — his positive is consistent rather than confirmatory. Adding a structural differentiation is what separates neural from hamstring." },
         { t:"g", lab:"Observation and lumbar active range of motion with overpressure", id:"arom",
           res:"Sits shifted off the right buttock and moves slowly from sit to stand, but is willing to move once upright. No lateral shift. Flexion limited about 40% and reproduces the calf and foot pain. Extension limited about 25% and EASES the leg pain. Side bending and rotation full.",
           why:"Cheap, fast, and it frames everything after it. The asymmetry is the finding — flexion provokes the leg and extension eases it — and it is what makes repeated movements an obvious next step rather than a guess." },
@@ -149,7 +150,7 @@ const CASE = {
           why:"Largely duplicates the straight leg raise in a loaded position. The change with neck position is genuinely useful for separating neural from musculoskeletal pain, but on a patient with an already positive straight leg raise it adds less than it costs." },
         { t:"y", lab:"Prone instability test",
           res:"Pain with posterior-to-anterior pressure is unchanged when the legs are lifted.",
-          why:"Performed to exclude the stabilization subgroup, which had to be considered because he is under 40. As an independent test its diagnostic power is limited — a positive likelihood ratio near 1.7 — so it earns its place as part of a cluster rather than on its own." },
+          why:"Performed to exclude the stabilization subgroup, which had to be considered because he is under 40. As an independent test its diagnostic power is limited — a positive likelihood ratio of about 1.7 — so it earns its place as part of a cluster rather than on its own." },
         { t:"r", lab:"Sacroiliac provocation cluster — four tests",
           res:"None of the four reproduces his familiar symptoms.",
           why:"Not advised, and it costs more than it looks. The cluster is four separate tests — distraction, thigh thrust, compression and sacral thrust — so choosing it spends your entire examination on one hypothesis. A cluster with a sensitivity of 0.88 and specificity of 0.78 is only informative in a patient where the joint was plausible to begin with, and nothing in his presentation makes it so." },
@@ -182,12 +183,12 @@ const CASE = {
       task: "His patellar and Achilles reflexes are 2+ and symmetric. What does that tell you?",
       hint: "Which levels do those two reflexes actually test?",
       items: [
-        { t:"g", lab:"Very little about his level, because L5 has no deep tendon reflex to test",
+        { t:"g", lab:"Very little about his level — neither of those reflexes tests L5",
           res:"Selected.",
-          why:"Correct, and this is the trap on the slide. The patellar reflex tests L3 and the Achilles tests S1 and S2. A normal reflex examination is entirely compatible with an L5 radiculopathy, so the absence of reflex change is not evidence of absence at his level." },
+          why:"Correct, and this is the trap on the slide. The patellar reflex tests L3 and the Achilles tests S1 and S2, so both can be entirely normal in an L5 radiculopathy. The reflex that DOES test L5 is the medial hamstring, at L5 and S1 — and it was not performed. A normal patellar and Achilles tell you nothing about his affected level." },
         { t:"y", lab:"That his S1 and L3 levels are intact",
           res:"Selected.",
-          why:"True as far as it goes, and it is the right anatomy. What it misses is the implication — that his affected level was never tested, so the normal result should not reassure anyone about L5." },
+          why:"True as far as it goes, and it is the right anatomy. What it misses is the implication — his affected level was never tested by either reflex. The medial hamstring would have been the one to check." },
         { t:"r", lab:"That the neurological examination is negative",
           res:"Selected.",
           why:"Not advised. His neurological examination has two positive findings — a 4 out of 5 great toe extensor and reduced light touch over the L5 dermatome. Calling it negative because the reflexes are normal discards the two findings that changed the diagnosis." },
