@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intervention Planning — Ray Torres | DPHT 7441 Module 5</title>
+<style>
+  :root{
+    --navy:#012D46; --teal:#00778B; --green:#00783C; --ink:#1F2933; --muted:#5A6570;
+    --line:#D7DDE2; --tint:#F2F6F8; --tint2:#E8EFF2; --bg:#FFFFFF; --panel:#FFFFFF;
+    --g:#1B7F4B; --gbg:#E6F2EA; --y:#9A6700; --ybg:#FBF2DF; --r:#B3261E; --rbg:#FBEAE8;
+  }
+  :root:not([data-theme="light"]){ }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --navy:#8FC6DA; --teal:#4FB3C7; --ink:#E8EDF1; --muted:#9BA7B2;
+      --line:#2A3946; --tint:#16222C; --tint2:#1B2A36; --bg:#0E171F; --panel:#13202A;
+      --gbg:#14301F; --ybg:#31270F; --rbg:#37191A; --g:#6ED08F; --y:#E2B44C; --r:#F09189;
+    }
+  }
+  :root[data-theme="dark"]{
+    --navy:#8FC6DA; --teal:#4FB3C7; --ink:#E8EDF1; --muted:#9BA7B2;
+    --line:#2A3946; --tint:#16222C; --tint2:#1B2A36; --bg:#0E171F; --panel:#13202A;
+    --gbg:#14301F; --ybg:#31270F; --rbg:#37191A; --g:#6ED08F; --y:#E2B44C; --r:#F09189;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",Calibri,system-ui,-apple-system,sans-serif;line-height:1.5;}
+  .wrap{max-width:900px;margin:0 auto;padding:24px 18px 80px}
+  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+  .kick{font-size:11px;font-weight:700;letter-spacing:1.1px;color:var(--teal);text-transform:uppercase}
+  h1{font-size:26px;color:var(--navy);margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px}
+  .bar{display:flex;gap:6px;margin:16px 0 20px;flex-wrap:wrap}
+  .step{flex:1 1 90px;min-width:90px;padding:7px 8px;border-radius:6px;background:var(--tint);
+    border:1px solid var(--line);font-size:11px;font-weight:700;color:var(--muted);text-align:center}
+  .step.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .step.done{background:var(--tint2);color:var(--teal)}
+  h2{font-size:20px;color:var(--navy);margin:0 0 6px}
+  .task{background:var(--navy);color:#fff;border-radius:8px;padding:14px 16px;margin:0 0 16px}
+  .task p{margin:0;font-size:15px;font-weight:600}
+  .task .small{font-weight:400;font-size:13px;opacity:.85;margin-top:6px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:12px 14px;margin-bottom:9px;cursor:pointer;font:inherit;color:inherit;
+    transition:border-color .12s, background .12s}
+  .opt:hover{border-color:var(--teal)}
+  .opt[aria-pressed="true"]{border-color:var(--navy);background:var(--tint);border-width:2px}
+  .opt[disabled]{cursor:default;opacity:.85}
+  .opt .lab{font-weight:600}
+  .res{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:14px;color:var(--ink)}
+  .res b{color:var(--teal);font-size:11px;letter-spacing:.8px;text-transform:uppercase;display:block;margin-bottom:3px}
+  .meta{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .act{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button.go{background:var(--navy);color:#fff;border:0;border-radius:7px;padding:11px 20px;
+    font:inherit;font-weight:600;cursor:pointer}
+  button.go[disabled]{background:var(--muted);cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--teal);border:1px solid var(--line)}
+  .tier{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.8px;padding:3px 8px;
+    border-radius:20px;text-transform:uppercase;margin-left:8px;vertical-align:2px}
+  .t-green{background:var(--gbg);color:var(--g)} .t-yellow{background:var(--ybg);color:var(--y)}
+  .t-red{background:var(--rbg);color:var(--r)}
+  .sumsec{margin-bottom:22px}
+  .sumsec h3{font-size:15px;color:var(--navy);margin:0 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .sumrow{padding:10px 12px;border-radius:7px;margin-bottom:7px;font-size:14px}
+  .sumrow.g{background:var(--gbg)} .sumrow.y{background:var(--ybg)} .sumrow.r{background:var(--rbg)}
+  .sumrow .why{display:block;margin-top:5px;font-size:13px;color:var(--ink);opacity:.9}
+  .score{display:flex;gap:10px;margin:0 0 20px;flex-wrap:wrap}
+  .sc{flex:1 1 110px;padding:12px;border-radius:8px;text-align:center}
+  .sc .n{font-size:26px;font-weight:700;display:block}
+  .sc.g{background:var(--gbg);color:var(--g)} .sc.y{background:var(--ybg);color:var(--y)}
+  .sc.r{background:var(--rbg);color:var(--r)}
+  .imp{background:var(--tint);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+  .imp h4{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .none{color:var(--muted);font-style:italic;font-size:14px}
+  footer{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  @media(max-width:600px){ h1{font-size:21px} .step{font-size:10px;min-width:70px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kick">DPHT 7441 &nbsp;|&nbsp; Module 5 &nbsp;|&nbsp; Interactive Case</div>
+  <h1 id="caseTitle">Ray Torres, 38</h1>
+  <div class="sub" id="caseSub">Self-referred. Right-sided low back pain. Work through the case in your breakout room — your choices are scored, and the scoring is revealed at the end.</div>
+</header>
+
+<div class="bar" id="bar"></div>
+<main id="stage" aria-live="polite"></main>
+
+<p style="font-size:13px;color:var(--muted);margin:14px 0 0">When everyone is back we will talk through where groups disagreed with the scoring.</p>
+<footer>
+  Choices are tiered as strong, acceptable, or not advised. Tiers stay hidden until the summary.
+  Nothing is saved, submitted, or graded.
+</footer>
+</div>
+
+<script>
+const CASE = {
+  title: "Ray Torres, 38 — Intervention Planning",
+  sub: "Continuing from the sync session. The examination is done and the classification is set. Everything from here is what you do about it.",
+  allImpairments: [],
+  stages: [
+    {
+      key: "classify", label: "Classification", pick: 1,
+      task: "Confirm the treatment-based classification before you treat.",
+      hint: "One answer. You are checking it, not rediscovering it.",
+      items: [
+        { t:"g", lab:"Specific exercise — directional preference for extension",
+          res:"Confirmed. Repeated extension abolished his leg symptoms and the change was maintained.",
+          why:"Defined by one finding: symptoms centralize with a tested direction. His did, and it held after the movements stopped. Everything downstream follows from this." },
+        { t:"y", lab:"Traction",
+          res:"Selected.",
+          why:"The near miss, and understandable. He meets two of its three criteria — nerve root signs and symptoms distal to the knee. He fails the third, because he centralizes rather than peripheralizes, and that third criterion is the one that discriminates." },
+        { t:"r", lab:"Manipulation",
+          res:"Selected.",
+          why:"Not advised. He fails both factors of the two-factor pragmatic rule: his symptoms are three weeks old rather than under 16 days, and they travel distal to the knee. He also fails on a fear-avoidance work score of 22." },
+        { t:"r", lab:"Stabilization",
+          res:"Selected.",
+          why:"Not advised. He is 38, which satisfies the younger-age criterion, and that is the only one he meets. No aberrant movement, negative prone instability test, and this is his second episode rather than a third or more." }
+      ]
+    },
+    {
+      key: "manual", label: "Manual therapy", pick: 2,
+      task: "Choose TWO manual therapy interventions for visit one.",
+      hint: "Match the technique to the presentation, not to the diagnosis.",
+      items: [
+        { t:"g", lab:"Sciatic nerve slider, built from the straight leg raise position",
+          res:"Performed at low amplitude below his symptom threshold. He tolerates it and reports the leg feels less sensitive afterward.",
+          why:"His presentation is nerve root and leg pain, and neural mobilization is the adjunct that matches it. Sliders give greater excursion than tensioners and are the taught choice while a patient is irritable. Clinic dosing is not established — say so when students ask for sets and reps." },
+        { t:"g", lab:"Grade I to II posterior-to-anterior oscillation at the symptomatic level",
+          res:"Three bouts of 30 seconds. Resting pain reduces from 4 to 2 out of 10 and he tolerates the press-up better afterward.",
+          why:"Low-grade oscillation is for pain and irritability, and that is what he needs from manual therapy today. It is a door-opener for the exercise rather than the treatment itself." },
+        { t:"y", lab:"Soft tissue mobilization to the lumbar paraspinals",
+          res:"Sustained pressure to the right paraspinals. He reports feeling looser.",
+          why:"Acceptable for muscle guarding and it may make the extension exercise easier to tolerate. It carries a conditional recommendation for short-term relief in chronic low back pain, so use it as an adjunct rather than as the plan." },
+        { t:"y", lab:"Grade III to IV posterior-to-anterior mobilization at the symptomatic level",
+          res:"Performed. He reports increased leg symptoms during the third bout, settling within a minute.",
+          why:"Higher grades are for stiffness, and his problem today is irritability rather than a hypomobile segment — segmental mobility testing was unremarkable. Not harmful, but aimed at an impairment he does not have." },
+        { t:"r", lab:"Supine lumbopelvic thrust manipulation",
+          res:"Performed after screening and consent.",
+          why:"Not advised. He fails both factors of the pragmatic rule — over 16 days and symptoms distal to the knee. This is a matching decision rather than a contraindication, but the rule exists precisely to identify who this technique is for, and he is not that patient." },
+        { t:"r", lab:"Mechanical traction",
+          res:"Applied at 25% body weight for 12 minutes.",
+          why:"Not advised. He is not in the traction subgroup, because he centralizes. Mechanical traction also carries a Grade D recommendation for chronic low back pain with leg pain — do not use, no added benefit." },
+        { t:"r", lab:"Tensioner-biased sciatic neural mobilization",
+          res:"Both ends loaded. His calf symptoms increase and remain elevated afterward.",
+          why:"Not advised while he is irritable. Tensioners load both ends and stretch connective tissue; sliders are the taught starting point, with low amplitude, stopping at the onset of guarding." },
+        { t:"y", lab:"No manual therapy today — reassess after the exercise trial",
+          res:"Deferred.",
+          why:"Defensible, and worth arguing. His directional preference is the treatment, and manual therapy is an adjunct. If the press-up centralizes him in the clinic, you may not need anything else on visit one." }
+      ]
+    },
+    {
+      key: "exercise", label: "Therapeutic exercise", pick: 3,
+      task: "Choose THREE exercise or activity interventions for visit one.",
+      hint: "Direction first. Everything else is built on it.",
+      items: [
+        { t:"g", lab:"Prone lying progressing to prone press-up, in the direction that centralized",
+          res:"Tolerated. Ten repetitions abolish the calf symptoms and the effect holds for several minutes.",
+          why:"This is the matched intervention for his subgroup, and directional preference exercise carries a Grade A recommendation. The direction is extension because extension is what centralized him, not because extension is the usual answer for a disc." },
+        { t:"g", lab:"Extension in standing, performed during driving breaks before symptoms return",
+          res:"Prescribed every 30 to 45 minutes on the road.",
+          why:"Dosing the direction into his day is what makes it work. Performing it before symptoms return rather than after is the detail students miss — you are managing the provocation, not chasing it." },
+        { t:"g", lab:"Sitting and driving set-up, including a lumbar roll",
+          res:"Lumbar roll fitted. Sitting tolerance in clinic improves from 15 to 25 minutes.",
+          why:"His single largest exposure is sitting in a van, and sitting is his primary aggravating factor. Changing the posture he spends eight hours in does more than anything you do in the clinic." },
+        { t:"y", lab:"Walking program, graded by time",
+          res:"Twenty minutes daily, progressing by five minutes weekly.",
+          why:"Walking is one of his easing factors and general activity is worth prescribing. It is not what changes his trajectory this week, so it belongs in the plan rather than at the top of it." },
+        { t:"y", lab:"Early transversus abdominis and multifidus motor control training",
+          res:"Taught in supine. He can achieve a low-level contraction with cueing.",
+          why:"This is where he is going, not where he starts. Stabilization work becomes the priority once the directional preference has done its job and symptoms are stable — progressing there too early spends time the extension program needs." },
+        { t:"r", lab:"Repeated flexion in lying — knee to chest",
+          res:"Five repetitions return the calf symptoms, which persist afterward.",
+          why:"Not advised. Flexion is the direction that peripheralizes him. It is the exact opposite of the intervention his classification calls for, and it undoes the gain from the press-ups." },
+        { t:"r", lab:"Loaded lifting retraining with a barbell",
+          res:"Prescribed at a light load.",
+          why:"Not advised at three weeks with an active L5 deficit and symptoms that peripheralize with flexion. Lifting capacity is a genuine goal for a delivery driver, but it is a later-phase goal and it needs a stable directional response first." },
+        { t:"y", lab:"Education on prognosis and hurt versus harm",
+          res:"Delivered. He is reassured and asks whether he should stop driving.",
+          why:"His fear-avoidance work score is 22, which is above the threshold used in the manipulation rule and predicts a slower course. This is aimed at a measured impairment rather than being a courtesy — arguably it should be green, and it is worth letting a group argue that." }
+      ]
+    },
+    {
+      key: "progress", label: "Progression", pick: 2,
+      task: "Choose the TWO rules you will use to decide whether to progress him.",
+      hint: "You are deciding what you watch, not what you do.",
+      items: [
+        { t:"g", lab:"Re-test centralization at the start of every visit before progressing anything",
+          res:"Adopted as the standing rule.",
+          why:"Centralization is both the diagnostic finding and the progress marker. If it is maintained, the plan is working; if it is lost, something has changed and the direction needs re-testing before load is added." },
+        { t:"g", lab:"Re-test great toe extensor strength every visit and escalate if it worsens",
+          res:"Adopted. Documented at 4 out of 5 today.",
+          why:"A static mild motor deficit is managed conservatively. A progressive one is a referral. The only way to tell the difference is to measure it every visit and write it down." },
+        { t:"y", lab:"Progress when pain falls below 3 out of 10",
+          res:"Adopted as the threshold.",
+          why:"Pain is worth tracking and it is a poor progression trigger on its own. Symptoms can be low while still peripheralizing with the wrong movement, which is the situation this rule would miss." },
+        { t:"r", lab:"Follow a fixed three-sets-of-ten protocol regardless of his response",
+          res:"Adopted.",
+          why:"Not advised. The subgroup is defined by a response, so the dose has to follow the response. A fixed protocol discards the only information that tells you whether the direction is still right." },
+        { t:"r", lab:"Progress load on schedule even if leg symptoms return",
+          res:"Adopted.",
+          why:"Not advised. Returning leg symptoms are peripheralization, which is the signal to stop and re-test rather than to push through. This is the single most damaging rule on this list." }
+      ]
+    },
+    {
+      key: "outcomes", label: "Outcome measures", pick: 3,
+      task: "Choose THREE outcome measures to track him and inform discharge.",
+      hint: "One from each level of the diagnosis is a reasonable habit.",
+      items: [
+        { t:"g", lab:"Oswestry Disability Index",
+          res:"Baseline 34%.",
+          why:"The condition-specific disability measure for this population, and it is what his activity limitations are stated in. Change has to exceed measurement error before it means anything, so know the minimal detectable change for the version you use." },
+        { t:"g", lab:"Numeric Pain Rating Scale",
+          res:"Baseline 6 out of 10 at worst, 3 at rest.",
+          why:"Quick, responsive, and meaningful to him. On its own it is thin — it says nothing about function — which is why it belongs alongside a disability measure rather than instead of one." },
+        { t:"g", lab:"Great toe extensor manual muscle test",
+          res:"Baseline 4 out of 5 on the right.",
+          why:"The impairment measure that carries the safety question. It is the one finding on his chart that could change the plan from rehabilitation to referral, and it is free to re-test." },
+        { t:"y", lab:"Fear-Avoidance Beliefs Questionnaire, work subscale",
+          res:"Baseline 22.",
+          why:"Worth re-administering because it is elevated and it predicts his course. It is a prognostic and planning measure rather than a progress measure, so it does not need repeating every visit." },
+        { t:"y", lab:"Patient-Specific Functional Scale",
+          res:"He nominates driving a full route, loading the van, and sleeping through the night.",
+          why:"Captures participation in his own words, which is the level the ODI handles only generically. Acceptable and arguably strong — the trade-off is that self-nominated items make comparison across patients harder." },
+        { t:"r", lab:"Pelvic Girdle Questionnaire",
+          res:"Administered.",
+          why:"Not advised. It is designed for pelvic girdle pain, which is not his presentation. Administering a measure that does not match the condition produces numbers that cannot be interpreted." },
+        { t:"r", lab:"Discharge when he reports he feels better",
+          res:"Adopted as the discharge criterion.",
+          why:"Not advised. Discharge should rest on a measured change that exceeds error, a resolved or stable impairment, and a return to the participation goals he named. Feeling better is where that conversation starts, not where it ends." }
+      ]
+    }
+  ]
+};
+
+
+function shuffleStages(){
+  const sh=a=>{ const o=a.slice(); for(let i=o.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [o[i],o[j]]=[o[j],o[i]]; } return o; };
+  CASE.stages.forEach(st=>{ if(Array.isArray(st.items)) st.items=sh(st.items); });
+}
+shuffleStages();
+const TIERNAME = { g:"Strong choice", y:"Acceptable", r:"Not advised" };
+const TIERCLS  = { g:"t-green", y:"t-yellow", r:"t-red" };
+
+let si = 0;
+const picks = {};   // stageKey -> [itemIndex]
+let impairments = [];   // {id,name}
+let priorities = [];
+
+const bar = document.getElementById('bar');
+const stage = document.getElementById('stage');
+document.getElementById('caseTitle').textContent = CASE.title;
+document.getElementById('caseSub').textContent = CASE.sub;
+
+function drawBar(){
+  bar.innerHTML = '';
+  CASE.stages.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='step'+(i===si?' on':(i<si?' done':''));
+    d.textContent=(i+1)+'. '+s.label;
+    bar.appendChild(d);
+  });
+  const d=document.createElement('div');
+  d.className='step'+(si>=CASE.stages.length?' on':'');
+  d.textContent=(CASE.stages.length+1)+'. Summary';
+  bar.appendChild(d);
+}
+
+function currentItems(s){
+  if(!s.dynamic) return s.items;
+  return impairments.map(im=>({ t:null, lab:im.name, id:im.id }));
+}
+
+function render(){
+  drawBar();
+  if(si>=CASE.stages.length){ renderSummary(); return; }
+  const s = CASE.stages[si];
+  const items = currentItems(s);
+  picks[s.key] = picks[s.key] || [];
+
+  if(s.dynamic && items.length===0){
+    stage.innerHTML = '<h2>'+s.label+'</h2><p class="none">You did not perform any test that produced an impairment, so there is nothing to prioritize. That is itself a finding — go on, and the summary will show what you missed.</p>';
+    const act=document.createElement('div'); act.className='act';
+    const b=document.createElement('button'); b.className='go'; b.textContent='Continue';
+    b.onclick=()=>{ si++; render(); window.scrollTo(0,0); };
+    act.appendChild(b); stage.appendChild(act); return;
+  }
+
+  const need = Math.max(1, Math.min(s.pick, items.length - 1));
+  stage.innerHTML='';
+  const h=document.createElement('h2'); h.textContent=s.label; stage.appendChild(h);
+  const t=document.createElement('div'); t.className='task';
+  t.innerHTML='<p>'+s.task+'</p>'+(s.hint?'<p class="small">'+s.hint+'</p>':'');
+  stage.appendChild(t);
+  const m=document.createElement('p'); m.className='meta';
+  m.id='counter'; stage.appendChild(m);
+
+  items.forEach((it,idx)=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.type='button';
+    b.setAttribute('aria-pressed', picks[s.key].includes(idx)?'true':'false');
+    const lab=document.createElement('span'); lab.className='lab'; lab.textContent=it.lab;
+    b.appendChild(lab);
+    b.onclick=()=>toggle(s,idx,b,need);
+    stage.appendChild(b);
+    if(picks[s.key].includes(idx) && it.res) showRes(b,it.res);
+  });
+
+  const act=document.createElement('div'); act.className='act';
+  const go=document.createElement('button'); go.className='go'; go.id='next';
+  go.textContent = (si===CASE.stages.length-1)?'See summary':'Next stage';
+  go.onclick=()=>{
+    if(s.dynamic) priorities = picks[s.key].map(i=>items[i]);
+    si++; render(); window.scrollTo(0,0);
+  };
+  act.appendChild(go); stage.appendChild(act);
+  updateCount(s,need);
+}
+
+function showRes(btn,text){
+  if(btn.querySelector('.res')) return;
+  const r=document.createElement('div'); r.className='res';
+  r.innerHTML='<b>Result</b>'+text;
+  btn.appendChild(r);
+}
+
+function toggle(s,idx,btn,need){
+  const arr=picks[s.key];
+  const at=arr.indexOf(idx);
+  if(at>=0){
+    arr.splice(at,1);
+    btn.setAttribute('aria-pressed','false');
+    const r=btn.querySelector('.res'); if(r) r.remove();
+  } else {
+    if(arr.length>=need) return;
+    arr.push(idx);
+    btn.setAttribute('aria-pressed','true');
+    const items=currentItems(s);
+    if(items[idx].res) showRes(btn,items[idx].res);
+  }
+  updateCount(s,need);
+}
+
+function updateCount(s,need){
+  const n=picks[s.key].length;
+  const c=document.getElementById('counter');
+  if(c) c.textContent = n+' of '+need+' selected'+(n<need?' — select '+(need-n)+' more to continue.':'');
+  const go=document.getElementById('next');
+  if(go) go.disabled = n<need;
+  if(s.key==='measures'){
+    impairments=[];
+    picks.measures.forEach(i=>{ const im=s.items[i].imp; if(im && !impairments.find(x=>x.id===im.id)) impairments.push(im); });
+  }
+}
+
+function renderSummary(){
+  stage.innerHTML='';
+  const h=document.createElement('h2'); h.textContent='Summary and Scoring'; stage.appendChild(h);
+  let g=0,y=0,r=0;
+  CASE.stages.forEach(s=>{
+    if(s.dynamic) return;
+    (picks[s.key]||[]).forEach(i=>{ const t=s.items[i].t; if(t==='g')g++; else if(t==='y')y++; else if(t==='r')r++; });
+  });
+  const sc=document.createElement('div'); sc.className='score';
+  sc.innerHTML =
+    '<div class="sc g"><span class="n">'+g+'</span>Strong choices</div>'+
+    '<div class="sc y"><span class="n">'+y+'</span>Acceptable</div>'+
+    '<div class="sc r"><span class="n">'+r+'</span>Not advised</div>';
+  stage.appendChild(sc);
+
+  CASE.stages.forEach(s=>{
+    const sec=document.createElement('div'); sec.className='sumsec';
+    const t=document.createElement('h3'); t.textContent=s.label; sec.appendChild(t);
+    if(s.dynamic){
+      if(priorities.length===0){
+        const p=document.createElement('p'); p.className='none';
+        p.textContent='No impairments were available to prioritize, because none of the measures you chose produced one.';
+        sec.appendChild(p);
+      } else {
+        priorities.forEach((im,i)=>{
+          const d=document.createElement('div'); d.className='sumrow';
+          d.style.background='var(--tint)';
+          d.innerHTML='<b>Priority '+(i+1)+':</b> '+im.name;
+          sec.appendChild(d);
+        });
+        const all = CASE.allImpairments || [];
+        const miss = all.filter(o=>!impairments.find(x=>x.id===o.id));
+        if(miss.length){
+          const d=document.createElement('div'); d.className='sumrow y';
+          d.innerHTML='<b>Not tested for, so never available to you:</b><span class="why">'+
+            miss.map(o=>o.name).join('; ')+
+            '</span>';
+          sec.appendChild(d);
+        }
+      }
+      stage.appendChild(sec); return;
+    }
+    (picks[s.key]||[]).forEach(i=>{
+      const it=s.items[i];
+      const d=document.createElement('div'); d.className='sumrow '+it.t;
+      d.innerHTML='<b>'+it.lab+'</b><span class="tier '+TIERCLS[it.t]+'">'+TIERNAME[it.t]+'</span>'+
+        '<span class="why">'+it.why+'</span>';
+      sec.appendChild(d);
+    });
+    const missed = s.items.map((it,i)=>({it,i})).filter(o=>o.it.t==='g' && !(picks[s.key]||[]).includes(o.i));
+    if(missed.length){
+      const d=document.createElement('div'); d.className='sumrow';
+      d.style.background='var(--tint)';
+      d.innerHTML='<b>Strong choices you did not take</b><span class="why">'+
+        missed.map(o=>o.it.lab).join(' &nbsp;·&nbsp; ')+'</span>';
+      sec.appendChild(d);
+    }
+    stage.appendChild(sec);
+  });
+
+  const act=document.createElement('div'); act.className='act';
+  const again=document.createElement('button'); again.className='go ghost'; again.textContent='Start over';
+  again.onclick=()=>{ si=0; for(const k in picks) delete picks[k]; impairments=[]; priorities=[]; render(); window.scrollTo(0,0); };
+  act.appendChild(again); stage.appendChild(act);
+}
+
+render();
+</script>
+</body>
+</html>

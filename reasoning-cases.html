@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reasoning Cases — DPHT 7441 Module 5</title>
+<style>
+  :root{ --navy:#012D46; --teal:#00778B; --ink:#1F2933; --muted:#5A6570;
+    --line:#D7DDE2; --tint:#F2F6F8; --tint2:#E8EFF2; --bg:#FFFFFF; --panel:#FFFFFF;
+    --g:#1B7F4B; --gbg:#E6F2EA; --y:#9A6700; --ybg:#FBF2DF; --r:#B3261E; --rbg:#FBEAE8; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --navy:#8FC6DA; --teal:#4FB3C7; --ink:#E8EDF1; --muted:#9BA7B2;
+      --line:#2A3946; --tint:#16222C; --tint2:#1B2A36; --bg:#0E171F; --panel:#13202A;
+      --gbg:#14301F; --ybg:#31270F; --rbg:#37191A; --g:#6ED08F; --y:#E2B44C; --r:#F09189; } }
+  :root[data-theme="dark"]{ --navy:#8FC6DA; --teal:#4FB3C7; --ink:#E8EDF1; --muted:#9BA7B2;
+    --line:#2A3946; --tint:#16222C; --tint2:#1B2A36; --bg:#0E171F; --panel:#13202A;
+    --gbg:#14301F; --ybg:#31270F; --rbg:#37191A; --g:#6ED08F; --y:#E2B44C; --r:#F09189; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",Calibri,system-ui,-apple-system,sans-serif;line-height:1.5}
+  .wrap{max-width:880px;margin:0 auto;padding:24px 18px 80px}
+  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+  .kick{font-size:11px;font-weight:700;letter-spacing:1.1px;color:var(--teal);text-transform:uppercase}
+  h1{font-size:25px;color:var(--navy);margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px}
+  .bar{display:flex;gap:5px;margin:16px 0 20px;flex-wrap:wrap}
+  .step{flex:1 1 74px;min-width:74px;padding:6px 5px;border-radius:5px;background:var(--tint);
+    border:1px solid var(--line);font-size:10px;font-weight:700;color:var(--muted);text-align:center}
+  .step.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .step.done{background:var(--tint2);color:var(--teal)}
+  h2{font-size:20px;color:var(--navy);margin:0 0 10px}
+  .task{background:var(--navy);color:#fff;border-radius:8px;padding:14px 16px;margin:0 0 14px}
+  .task p{margin:0;font-size:16px;font-weight:600}
+  .task .small{font-weight:400;font-size:13px;opacity:.85;margin-top:6px}
+  .vig{background:var(--tint);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:16px}
+  .vig h3{margin:0 0 8px;font-size:11px;letter-spacing:.9px;color:var(--teal);text-transform:uppercase}
+  .vig p{margin:0 0 9px;font-size:15px} .vig p:last-child{margin:0}
+  .vig p.quote{font-style:italic;font-size:16px;color:var(--navy);padding-left:12px;border-left:3px solid var(--teal)}
+  textarea,input[type=text]{width:100%;font:inherit;color:inherit;background:var(--panel);
+    border:1px solid var(--line);border-radius:7px;padding:11px 12px;margin-bottom:9px}
+  textarea{min-height:110px;resize:vertical}
+  textarea:focus,input:focus{outline:none;border-color:var(--teal)}
+  label.fl{display:block;font-size:12px;font-weight:700;color:var(--teal);margin:0 0 4px;letter-spacing:.5px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:12px 14px;margin-bottom:9px;cursor:pointer;font:inherit;color:inherit}
+  .opt:hover{border-color:var(--teal)}
+  .opt[aria-pressed="true"]{border-color:var(--navy);background:var(--tint);border-width:2px}
+  .opt .lab{font-weight:600}
+  .res{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:14px}
+  .res b{color:var(--teal);font-size:11px;letter-spacing:.8px;text-transform:uppercase;display:block;margin-bottom:3px}
+  .meta{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .act{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button.go{background:var(--navy);color:#fff;border:0;border-radius:7px;padding:11px 20px;font:inherit;font-weight:600;cursor:pointer}
+  button.go[disabled]{background:var(--muted);cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--teal);border:1px solid var(--line)}
+  .pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  a.case{display:block;text-decoration:none;color:inherit;background:var(--panel);border:1px solid var(--line);
+    border-radius:9px;padding:15px 17px;cursor:pointer}
+  a.case:hover{border-color:var(--teal)}
+  a.case .t{font-size:17px;font-weight:600;color:var(--navy)}
+  a.case .d{font-size:13.5px;color:var(--muted);margin-top:4px}
+  .sumsec{margin-bottom:20px}
+  .sumsec h3{font-size:14px;color:var(--navy);margin:0 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .sumrow{padding:10px 12px;border-radius:7px;margin-bottom:7px;font-size:14px}
+  .sumrow.g{background:var(--gbg)} .sumrow.y{background:var(--ybg)} .sumrow.r{background:var(--rbg)}
+  .sumrow.n{background:var(--tint)}
+  .sumrow .why{display:block;margin-top:5px;font-size:13px;opacity:.92}
+  .yours{background:var(--tint2);border-left:3px solid var(--teal);border-radius:0 7px 7px 0;
+    padding:11px 14px;margin-bottom:9px;font-size:14px;white-space:pre-wrap}
+  .disc{background:var(--navy);color:#fff;border-radius:8px;padding:16px 18px;margin:18px 0}
+  .disc h3{margin:0 0 8px;font-size:12px;letter-spacing:.9px;text-transform:uppercase;color:#7FC4D6}
+  .disc ul{margin:0;padding-left:18px} .disc li{margin-bottom:7px;font-size:14.5px}
+  .warn{background:var(--rbg);border-radius:8px;padding:13px 15px;margin-bottom:14px;font-size:14px}
+  .warn b{color:var(--r);display:block;margin-bottom:4px;font-size:11.5px;letter-spacing:.8px;text-transform:uppercase}
+  footer{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  @media(max-width:620px){.pick{grid-template-columns:1fr}h1{font-size:21px}.step{font-size:9px;min-width:60px}}
+  @media print{.act,.bar,footer{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kick">DPHT 7441 &nbsp;|&nbsp; Module 5 &nbsp;|&nbsp; Lumbar Spine and SIJ</div>
+  <h1 id="h1">Reasoning Cases</h1>
+  <div class="sub" id="hsub">Work a case from presentation to outcome measure. Your written answers are yours; your selections are scored at the end.</div>
+</header>
+<div class="bar" id="bar"></div>
+<main id="stage" aria-live="polite"></main>
+<footer>Nothing is saved, submitted, or graded. This is practice for you.</footer>
+</div>
+
+<script>
+const CASES = [
+{
+  id:"stenosis", name:"Case 1 — Margaret, 71",
+  hyp_key:{
+    most:{ name:"Lumbar spinal stenosis with neurogenic claudication",
+      keys:["stenosis","claudication","canal"],
+      why:"At 71 with back AND leg symptoms that have progressed over eight months and are taking activities away, stenosis is the condition the referral points at most strongly. Age alone moves it up the list." },
+    less:[
+      { name:"Lumbar radiculopathy", why:"Leg symptoms keep a nerve root on the list, though a slow eight-month progression without a clear event makes a disc less likely than it would be in a younger patient." },
+      { name:"Hip osteoarthritis", why:"At 71, leg and buttock symptoms that limit walking can come from the hip. Worth carrying until the examination separates it." } ],
+    remote:[
+      { name:"Vascular claudication", why:"Walking-limited leg symptoms in a 71-year-old always need vascular claudication excluded, even when stenosis is the better fit. It is the one that is easy to forget and costly to miss." },
+      { name:"Compression fracture or malignancy", why:"Age over 50 is a screening trigger on its own. A progressive course in an older adult earns the question even without other red flags." } ],
+    serious:["vascular","arterial","pad","pvd","peripheral","fracture","tumor","cancer","malignan","metast","aneurysm"]
+  },
+  blurb:"Eight months of low back and leg symptoms in a 71-year-old who has slowed down and wants that back.",
+  stem:{ ctx:"Margaret, 71. Self-referred, no physician diagnosis. Eight months of low back and leg symptoms.", quote:"“It started about eight months ago and it has gotten worse since then. I have had to stop doing some of the things I used to do. I would like to get back to them.”" },
+  subjective:[
+    { id:"loc", label:"Location and referral", text:"Both buttocks and the backs of both thighs, symmetrical side to side. No pain in the middle of her low back. Nothing below either knee." },
+    { id:"agg", label:"Aggravating factors", text:"Symptoms come on after about one block of walking, and after a few minutes standing at the kitchen counter. Walking downhill is worse than walking uphill." },
+    { id:"ease", label:"Easing factors", text:"They ease within a few minutes of sitting down. She has noticed she can walk much further around the supermarket leaning on a shopping cart than she can around the block." },
+    { id:"day", label:"24-hour behavior", text:"No pain at rest and none in bed. She wakes comfortable. Symptoms build through the day in proportion to how much she has been on her feet." },
+    { id:"flags", label:"Screening questions", text:"No bowel or bladder change and no saddle numbness. No unexplained weight loss, no fever, no history of cancer, no trauma. Hypertension, controlled with medication." },
+    { id:"neuro", label:"Neurological symptoms", text:"No numbness or tingling reported. No weakness noticed, although she says both legs feel heavy once the symptoms have started." },
+    { id:"hist", label:"History, work and goals", text:"Eight months, gradually worsening. No previous episodes. She walks her dog every morning and has cut the route in half. That is what she wants back." }
+  ],
+  measures:[
+    { t:"g", lab:"Lumbar active range of motion with overpressure", id:"arom",
+      res:"Extension limited about 50% and reproduces the buttock symptoms. Flexion full and comfortable.",
+      why:"Establishes the movement pattern and, more usefully, shows that extension provokes and flexion does not. That asymmetry is the whole picture in a stenotic presentation." },
+    { t:"g", lab:"Timed walking test to symptom onset", id:"walk",
+      res:"Symptoms begin at 95 seconds of level walking. Resolve within 2 minutes of sitting.",
+      why:"Quantifies the complaint in a way you can re-measure, and it is the measure that matters to her. Distance or time to onset beats a pain score in this presentation." },
+    { t:"g", lab:"Lower quarter neurological screen", id:"neuro",
+      res:"Myotomes five out of five, dermatomes intact, reflexes two plus and symmetric.",
+      why:"Expected normal, and a predicted normal is still a prediction. In an older adult with bilateral leg symptoms you close this before loading her." },
+    { t:"y", lab:"Passive hip range of motion", id:"hip",
+      res:"Internal rotation 28 degrees bilaterally. No groin pain reproduced.",
+      why:"Reasonable to screen the hip in a 71-year-old with buttock pain. It does not discriminate here, and it costs time you could spend on the walking test." },
+    { t:"y", lab:"Trunk extensor endurance test", id:"end",
+      res:"Holds 42 seconds before losing position.",
+      why:"Below typical values and relevant to her program later. It is provocative in a patient whose symptoms are extension-driven, so it is poorly timed today." },
+    { t:"r", lab:"Sacroiliac provocation cluster — four tests", id:"sij",
+      res:"None of the four reproduces her symptoms.",
+      why:"Not indicated. Her symptoms are bilateral, activity-dependent and posture-relieved. Nothing points at the sacroiliac joint, and this is four tests spent on a hypothesis with no support." }
+  ],
+  special:[
+    { t:"g", lab:"Cycling tolerance compared with walking tolerance", id:"bike",
+      res:"She cycles for six minutes on a stationary bike without symptoms, having reported symptoms after one block of walking.",
+      why:"Separates neurogenic from vascular claudication, which nothing else you have done can do. The chapter gives the reasoning: both cycling and walking increase the demand for blood supply, so vascular claudication worsens with either. Neurogenic claudication worsens with walking and is unaffected by cycling, because of the differing lumbar spine positions the two activities require." },
+    { t:"g", lab:"Walking tolerance upright compared with walking flexed over a cart", id:"tread",
+      res:"She walks one block before symptoms begin when upright. Leaning over a shopping cart she completes four blocks without symptoms.",
+      why:"This isolates posture while holding the activity constant. The chapter notes that a flexed position increases the anteroposterior diameter of the intervertebral canal, so a large difference between upright and flexed walking points straight at a posture-dependent mechanism. The cycling comparison tests demand; this one tests position." },
+    { t:"y", lab:"Straight leg raise", id:"slr",
+      res:"Negative bilaterally to 75 degrees.",
+      why:"Worth performing to check for a neural component, and the expected negative is informative. It does not distinguish between the hypotheses actually competing here." },
+    { t:"y", lab:"Slump test", id:"slump",
+      res:"Negative bilaterally.",
+      why:"Largely duplicates the straight leg raise. Reasonable, and it adds little once the straight leg raise is negative." },
+    { t:"r", lab:"Crossed straight leg raise", id:"xslr",
+      res:"Negative.",
+      why:"Not indicated. It is specific for a large central disc herniation, and she has no unilateral radicular pattern to investigate." },
+    { t:"r", lab:"FABER test", id:"faber",
+      res:"Negative bilaterally.",
+      why:"Not indicated. FABER earns its place when a groin ache or hip question needs localizing, and she has neither." }
+  ],
+  impairments:[
+    { t:"g", lab:"Walking tolerance limited by posture-dependent symptoms", need:"walk" , why:"The impairment that matches both her limitation and her goal. It is posture-dependent rather than distance-dependent, which is what the upright-versus-flexed comparison demonstrated, and it is what the treatment will exploit." },
+    { t:"g", lab:"Painful restricted lumbar extension", need:"arom" , why:"Measured, re-measurable, and it names the direction that provokes her. It is also the reason an extension-based program would be exactly the wrong prescription." },
+    { t:"y", lab:"Reduced trunk extensor endurance", need:"end" , why:"Real, and worth addressing in a 71-year-old who wants to walk further. It is not what limits her walking distance today, so it belongs in the plan of care rather than at the top of it." },
+    { t:"y", lab:"Reduced hip internal rotation", need:"hip" , why:"A genuine finding at 28 degrees bilaterally. It does not explain her symptoms and it does not change today's plan, which is why it ranks below the two above it." },
+    { t:"r", lab:"Lower extremity neurological deficit", need:"neuro",
+      why:"Not present. Her neurological screen was normal, so this impairment does not exist to be treated." },
+    { t:"r", lab:"Sacroiliac joint dysfunction", need:"sij",
+      why:"Not present. The provocation cluster was negative and nothing in her presentation pointed there." },
+    { t:"r", lab:"Directional preference for extension", need:"arom",
+      why:"The opposite of what you found. Extension provokes her; flexion relieves her. Selecting this means the movement examination was read backwards." }
+  ],
+  interventions:[
+    { t:"g", lab:"Flexion-biased exercise program",
+      why:"Matched to the direction that relieves her. Flexion increases the anteroposterior diameter of the canal, which is the mechanism behind every position that helps her." },
+    { t:"g", lab:"Graded walking program using a flexed posture",
+      why:"Trains the activity she came for, in the posture she tolerates. A cart, poles or an inclined treadmill lets her accumulate walking volume she could not otherwise reach." },
+    { t:"g", lab:"Education on positional strategies for daily activities",
+      why:"Sitting breaks, leaning on a shopping cart, a foot on a step at the counter. These are free, immediate, and they address the exact situations she described." },
+    { t:"y", lab:"Stationary cycling for general conditioning",
+      why:"She tolerates it and it maintains cardiovascular fitness. It does not train walking, which is her goal, so it supports the plan rather than being it." },
+    { t:"y", lab:"Trunk and hip strengthening",
+      why:"Reasonable and appropriate for a 71-year-old, and it addresses a measured impairment if you tested endurance. It is not what limits her walking distance today." },
+    { t:"r", lab:"Extension-biased exercise program",
+      why:"Not advised. Extension is what provokes her. This is the correct intervention for a different classification and it runs directly against her response." },
+    { t:"r", lab:"Thrust manipulation",
+      why:"Not advised here. There is no hypomobility finding, symptoms are bilateral, and she does not fit the presentation the manipulation rule was built on." },
+    { t:"r", lab:"Rest and activity avoidance until symptoms settle",
+      why:"Not advised. Her symptoms settle with rest already, and avoidance reduces the walking tolerance you are trying to build. Deconditioning is the risk here, not flare-up." }
+  ],
+  outcomes:[
+    { t:"g", lab:"Timed or distance walking test",
+      why:"The measure that matches her goal and her limitation. It is objective, repeatable, and it is the thing she will notice changing." },
+    { t:"g", lab:"Oswestry Disability Index",
+      why:"The condition-specific disability measure for this population, and it captures the activities she has given up. Know the minimal detectable change before you call a difference real." },
+    { t:"y", lab:"Numeric Pain Rating Scale",
+      why:"Quick and meaningful to her, and thin on its own. Her problem is a tolerance limit rather than a pain level." },
+    { t:"y", lab:"Patient-Specific Functional Scale",
+      why:"Captures the dog walk in her own words, which the Oswestry only handles generically. Arguably strong; the trade-off is that self-nominated items are harder to compare across patients." },
+    { t:"r", lab:"Fear-Avoidance Beliefs Questionnaire alone",
+      why:"Not as a primary measure. It is a prognostic tool and she is not fear-avoidant — she is walking daily and wants to walk further." },
+    { t:"r", lab:"Discharge when she reports feeling better",
+      why:"Not a measure. Discharge should rest on a measured change that exceeds error and on the walking goal she named." }
+  ],
+  discuss:[
+    "The bicycle test is the discriminator, and it works because it holds metabolic demand constant and changes only spinal posture. Ask which other finding does the same job.",
+    "Everything that helps her involves flexion; everything that provokes her involves extension. Ask the room to name the mechanism before naming the diagnosis.",
+    "Her neurological screen is normal and that does not weaken the case. Ask why a normal screen is compatible with this presentation.",
+    "She has a goal that is measurable in distance. Ask whether anyone chose a pain measure as their primary outcome, and what that would miss."
+  ]
+},
+{
+  id:"pgp", name:"Case 2 — Alina, 34",
+  hyp_key:{
+    most:{ name:"Pregnancy-related pelvic girdle pain",
+      keys:["pelvic girdle","girdle","sacroiliac","sij","si joint","pgp","symphys"],
+      why:"Symptoms that began during pregnancy and have not settled five months postpartum are the textbook setting for pelvic girdle pain. The referral points here before anything else." },
+    less:[
+      { name:"Nonspecific or mechanical low back pain", why:"Always a legitimate candidate, and caring for a toddler and a baby is a heavy mechanical load. It ranks below pelvic girdle pain because the onset was tied to the pregnancy." },
+      { name:"Pubic symphysis dysfunction", why:"Part of the pelvic ring and commonly involved in pregnancy. It becomes more likely if there is groin or anterior pelvic pain." } ],
+    remote:[
+      { name:"Sacral stress fracture", why:"Chapter 29 names a stress fracture of the sacrum as a further source of sacral pain, and the pelvic girdle pain CPG lists sacral stress fracture among its related diagnoses. Unlikely, but it is the one that changes management entirely." },
+      { name:"Inflammatory sacroiliitis", why:"Chapter 29 lists sacroiliitis from systemic arthritis, such as ankylosing spondylitis, among the causes of pelvic pain, and the pelvic girdle pain CPG lists sacroiliitis among its related diagnoses. Worth keeping in view if there is prolonged morning stiffness or alternating buttock pain." } ],
+    serious:["fracture","inflammat","spondyl","sacroiliitis","infection","tumor"]
+  },
+  blurb:"Five months postpartum with low back and pelvic pain that has not settled on its own.",
+  stem:{ ctx:"Alina, 34. Five months postpartum after her second delivery. Low back symptoms that began during the pregnancy.", quote:"“It started when I was pregnant and it has not settled. I have been told it would go away on its own. It has been five months and I have a toddler and a baby to look after.”" },
+  subjective:[
+    { id:"loc", label:"Location and referral", text:"Right posterior pelvis, just below and medial to the posterior superior iliac spine. She points to it with one finger. No midline low back pain. An intermittent ache in the right groin. Nothing below the knee." },
+    { id:"agg", label:"Aggravating factors", text:"Worst going up stairs, getting out of the car, rolling in bed, and standing on one leg to dress. Walking beyond about fifteen minutes. She also describes an intermittent ache in the right groin that she does not connect to the pelvic pain." },
+    { id:"ease", label:"Easing factors", text:"Sitting eases it. Lying down eases it. Nothing has made a lasting difference in five months." },
+    { id:"day", label:"24-hour behavior", text:"Worse by the end of the day. She wakes when she rolls over and settles once she has found a position. Sleep is poor, partly because of the baby." },
+    { id:"flags", label:"Screening questions", text:"No bowel or bladder change and no saddle numbness. No fever, no weight loss, no trauma. She is breastfeeding." },
+    { id:"neuro", label:"Neurological symptoms", text:"No pain below the knee. No numbness or tingling anywhere. No weakness reported." },
+    { id:"hist", label:"History, work and goals", text:"Began in the third trimester of her second pregnancy and never resolved. The same thing happened in her first pregnancy and settled by three months postpartum. She wants to carry her toddler on one hip and return to running." }
+  ],
+  measures:[
+    { t:"g", lab:"Active straight leg raise, with and without manual pelvic compression", id:"aslr",
+      res:"Right side rated 3 out of 5 for difficulty. Rated 1 out of 5 when you apply manual compression through the ilia.",
+      why:"The one test here that is diagnostic and treatment-guiding at the same time. Improvement with compression demonstrates a force closure deficit and tells you what to prescribe." },
+    { t:"g", lab:"Lumbar active range of motion with repeated movements", id:"arom",
+      res:"Full and pain-free in all directions. No lasting change in symptoms with repeated flexion or extension.",
+      why:"Performed to exclude a directional preference, and the absence of one is the finding. It removes the specific exercise subgroup and keeps the focus on load transfer." },
+    { t:"g", lab:"Lower quarter neurological screen", id:"neuro",
+      res:"Myotomes five out of five, dermatomes intact, reflexes two plus and symmetric.",
+      why:"Expected normal, and it closes the last screening question before loading her. A groin ache in a postpartum woman deserves a documented normal." },
+    { t:"y", lab:"Single-leg stance and Trendelenburg", id:"trend",
+      res:"Positive on the right. Pelvic drop on the left with right single-leg stance, held 8 seconds before symptoms.",
+      why:"Directly relevant to her aggravating activities and to the hip abductor contribution to force closure. Useful, and it follows from the active straight leg raise rather than standing alone." },
+    { t:"y", lab:"Hip range of motion and resisted testing", id:"hip",
+      res:"Full range bilaterally. Resisted adduction reproduces the groin ache faintly.",
+      why:"Worth doing because of the groin ache, and the faint adductor response is a real clue toward the anterior pelvic ring. It is secondary to the posterior findings." },
+    { t:"r", lab:"Lumbar segmental mobility testing at every level", id:"seg",
+      res:"No hypomobile or painful segment identified.",
+      why:"Not indicated as a priority. Her symptoms are load-transfer in character with no lumbar directional response, so the lumbar spine is not where this examination should spend its time. The negative result is expected and changes nothing." }
+  ],
+  special:[
+    { t:"g", lab:"Thigh thrust (posterior pelvic pain provocation)", id:"p4",
+      res:"Reproduces her familiar right posterior pelvic pain.",
+      why:"Highest sensitivity of the provocation tests, so it is one of the two the sequencing starts with. A positive here plus a positive distraction is enough to stop testing." },
+    { t:"g", lab:"Distraction test", id:"dist",
+      res:"Reproduces her familiar right posterior pelvic pain.",
+      why:"Highest specificity of the provocation tests. With thigh thrust also positive, the two-of-four threshold is met and the cluster is complete." },
+    { t:"y", lab:"Compression test", id:"comp",
+      res:"Reproduces her familiar right posterior pelvic pain.",
+      why:"A third positive in the cluster, and it changes nothing. The sequencing begins with distraction and thigh thrust, and the chapter states that if both reproduce the pain, further tests are not indicated. Useful to have performed; better to have stopped." },
+    { t:"y", lab:"Pubic symphysis palpation and pubic stress test", id:"pubic",
+      res:"Mild tenderness over the symphysis. Stress test negative.",
+      why:"Worth doing because of the groin ache — the pubic stress test is 81% sensitive and 99% specific for symphysiolysis. A negative here largely closes the anterior ring." },
+    { t:"r", lab:"Straight leg raise", id:"slr",
+      res:"Negative bilaterally.",
+      why:"Not indicated as a priority. She has no symptoms below the knee, no paraesthesia and no neurological signs, so there is no neural hypothesis for it to address." },
+    { t:"y", lab:"Long dorsal sacroiliac ligament test", id:"ldl",
+      res:"Local tenderness on the right, reproducing her familiar pain.",
+      why:"Taught specifically for pregnancy-related and ligamentous posterior pelvic pain, and it fits her presentation. It supports the picture rather than deciding it — tenderness is less specific than provocation." }
+  ],
+  impairments:[
+    { t:"g", lab:"Failed load transfer through the pelvis", need:"aslr" , why:"The central impairment, and the only one you demonstrated changing inside the clinic. Her active straight leg raise went from 3 out of 5 to 1 with manual compression — the impairment and the treatment direction in a single test." },
+    { t:"g", lab:"Sacroiliac joint pain reproduced on loading", need:["p4","dist","comp"] , why:"Two of four provocation tests reproduce her familiar pain, which meets the threshold. It localizes the source without claiming a structural lesion you cannot see." },
+    { t:"y", lab:"Hip abductor weakness on the right", need:"trend" , why:"A positive Trendelenburg on the symptomatic side, and abductor function contributes to force closure. A contributor rather than the primary impairment." },
+    { t:"y", lab:"Adductor-related groin pain", need:"hip" , why:"Resisted adduction reproduced the groin ache faintly and the pubic stress test was negative, so the anterior ring is largely closed. Worth recording, minor in the plan." },
+    { t:"r", lab:"Directional preference for extension", need:"arom",
+      why:"Not present. Repeated movements produced no lasting change in either direction, which is why she is not a specific exercise case." },
+    { t:"r", lab:"Lumbar segmental hypomobility", need:"seg",
+      why:"Not present. Segmental testing was unremarkable, and it was not a priority test in this presentation." },
+    { t:"r", lab:"Lumbar radiculopathy", need:"neuro",
+      why:"Not present. Her neurological screen was normal and she has no symptoms below the knee." }
+  ],
+  interventions:[
+    { t:"g", lab:"Force closure training, progressed from isometric to loaded",
+      why:"Matched directly to the finding. Her active straight leg raise improved with manual compression, which says the system responds to added closure — so train the muscles that provide it. Start low: with a positive provocation cluster she may not yet tolerate exercise that compresses the pelvis further, so begin with low-load isometrics and progress on the active straight leg raise." },
+    { t:"y", lab:"Pelvic belt trial, with reassessment of the active straight leg raise",
+      why:"A genuine tension, and worth arguing. Her active straight leg raise improved with manual compression, which argues for trying it. But she also has a positive provocation cluster, and the physical examination recording notes these patients may not yet tolerate a compressive belt — the reference sheet says the same, and the pelvic girdle pain CPG rates support belts as Level D evidence. If you trial it, re-test the active straight leg raise and drop it if it aggravates rather than helps." },
+    { t:"g", lab:"Education on load management for lifting and carrying",
+      why:"She carries a toddler on one hip, which is the exact asymmetric load her pelvis is failing to transfer. Changing how she does it addresses the largest daily exposure." },
+    { t:"g", lab:"Hip abductor strengthening",
+      why:"She has a positive Trendelenburg on the symptomatic side, and the gluteals are among the muscles that matter most for load distribution through the pelvic girdle. It addresses a measured impairment and contributes directly to force closure." },
+    { t:"y", lab:"Graded return-to-running program",
+      why:"Her stated goal and a legitimate endpoint. It is premature as a day-one intervention while single-leg tolerance is eight seconds." },
+    { t:"r", lab:"End-range thrust manipulation to the sacroiliac joint",
+      why:"Not advised. Her problem is insufficient closure rather than restriction, and end-range thrust into a hypermobile postpartum pelvis is the wrong direction entirely." },
+    { t:"r", lab:"Directional preference exercise into extension",
+      why:"Not advised. Repeated movements produced no directional response, so there is no direction to prescribe. This is the right intervention for a different classification." },
+    { t:"r", lab:"Rest from all single-leg activity until pain resolves",
+      why:"Not advised. Avoidance removes the load her system needs to adapt to, and she has a five-month history that has not resolved with time already." }
+  ],
+  outcomes:[
+    { t:"g", lab:"Pelvic Girdle Questionnaire",
+      why:"The condition-specific measure for exactly this population, covering both activity and symptom items. If you are going to use one measure, use the one built for the condition." },
+    { t:"g", lab:"Active straight leg raise score",
+      why:"Both an impairment measure and a progress marker, scored 0 to 5 and re-testable in seconds. It is the finding that classified her, so it is the finding that should track her." },
+    { t:"y", lab:"Patient-Specific Functional Scale",
+      why:"Captures carrying her toddler and returning to running in her own words. Strong for goal-setting, and it complements rather than replaces a condition-specific measure." },
+    { t:"y", lab:"Numeric Pain Rating Scale",
+      why:"Fast and meaningful, and thin alone. Her limitation is task tolerance rather than pain intensity." },
+    { t:"y", lab:"Oswestry Disability Index",
+      why:"Not wrong, and poorly matched. It was developed for low back pain and misses the pelvic girdle items that describe her problem. Acceptable if you have nothing else; the Pelvic Girdle Questionnaire exists precisely for this population." },
+    { t:"r", lab:"Discharge when the provocation tests turn negative",
+      why:"Not advised. Provocation tests are diagnostic rather than prognostic, they are not designed as progress measures, and her goals are functional rather than test-based." }
+  ],
+  discuss:[
+    "The active straight leg raise is the only test that is diagnostic and treatment-guiding at once. Ask the room which other tests in the module do both.",
+    "Her repeated movements were negative, and that negative did real work. Ask what it removed.",
+    "Two of four provocation tests were positive, which meets the threshold. Ask whether anyone ran all four, and whether they should have.",
+    "Ask what the groin ache means here, and how many structures could account for it. The pubic stress test being negative is the reason it is not the anterior ring."
+  ]
+},
+{
+  id:"radic", name:"Case 3 — Devon, 44",
+  hyp_key:{
+    most:{ name:"Lumbar disc herniation with radiculopathy",
+      keys:["disc","herniat","radicul","nerve root","sciatica","radicular"],
+      why:"Back pain that has spread into the leg and is getting worse over six weeks in a 44-year-old manual worker is the classic referral for a disc with nerve root involvement." },
+    less:[
+      { name:"Zygapophyseal (facet) syndrome", why:"Can refer into the buttock and leg, and fits a manual worker. It ranks below a disc because the symptoms are spreading rather than staying local." },
+      { name:"Piriformis syndrome", why:"Produces leg symptoms in a pseudoradicular pattern. Worth carrying until a neurological screen and neurodynamic testing separate it." } ],
+    remote:[
+      { name:"Cauda equina syndrome or a progressive neurological deficit", why:"Worsening leg symptoms are exactly when you ask about saddle sensation, bladder and bowel, and progressive weakness. Rare, and not something you get to be late on." },
+      { name:"Malignancy or infection", why:"A worsening course without improvement earns the constitutional screen, even in a 44-year-old with an obvious mechanical story." } ],
+    serious:["cauda","equina","saddle","ces","bladder","bowel","progressive","tumor","cancer","malignan","infection","red flag"]
+  },
+  blurb:"Six weeks of back and leg pain that has got worse rather than better. Off work two weeks.",
+  stem:{ ctx:"Devon, 44. Warehouse logistics, currently off work. Six weeks of back and leg pain.", quote:"“It started in my back six weeks ago and it has gotten worse instead of better. I have never had anything like this before. I have been off work for two weeks and I am worried about my job.”" },
+  subjective:[
+    { id:"loc", label:"Location and referral", text:"Right low back, into the posterior calf and along the outer border of the foot. He says the leg is now worse than the back, and that this has changed over the six weeks." },
+    { id:"agg", label:"Aggravating factors", text:"Sitting is the worst, then bending forward. Coughing sharply increases the leg pain." },
+    { id:"ease", label:"Easing factors", text:"Nothing helps for long. Getting up and moving gives a few minutes of relief from the back pain, then it returns and the leg is unchanged. He has found no position of ease." },
+    { id:"day", label:"24-hour behavior", text:"Worse as the day goes on. He wakes two or three times a night and struggles to find a position. Mornings are stiff but no worse than the rest of the day." },
+    { id:"flags", label:"Screening questions", text:"No bowel or bladder change and no saddle numbness. No fever, no weight loss, no cancer history, no trauma." },
+    { id:"neuro", label:"Neurological symptoms", text:"Numbness along the outer border of the foot. He thinks his foot feels heavy on stairs and has caught his toe twice on the step." },
+    { id:"hist", label:"History, work and goals", text:"Six weeks, and the symptoms have traveled progressively further from his back. No previous episodes. He has been off work for two weeks and is worried he will not get back." }
+  ],
+  measures:[
+    { t:"g", lab:"Repeated movements in extension and flexion", id:"repeat",
+      res:"Repeated extension in standing makes the calf and foot symptoms WORSE, and they stay worse afterward. Repeated flexion increases his back pain and leaves the leg symptoms unchanged.",
+      why:"The most important measure in this case, and the answer is the opposite of what students expect. He peripheralizes with extension and nothing centralizes him in either direction. Both of those are defining criteria of the traction subgroup, and together they rule out specific exercise." },
+    { t:"g", lab:"Lower quarter neurological screen", id:"neuro",
+      res:"Plantarflexion four out of five on the right. Reduced sensation over the lateral foot. Achilles reflex diminished on the right compared with the left.",
+      why:"Three findings at one level, and it changes the whole complexion of the case. This is an S1 radiculopathy with a motor deficit, not referred somatic pain." },
+    { t:"g", lab:"Lumbar active range of motion with overpressure", id:"arom",
+      res:"Flexion limited about 50% and reproduces leg symptoms. Extension limited and also reproduces leg symptoms.",
+      why:"Both directions provoke, which is itself informative — there is no comfortable direction, and that fits an irritable nerve root rather than a mechanical directional problem." },
+    { t:"y", lab:"Observation for lateral shift", id:"shift",
+      res:"No lateral shift observed in standing.",
+      why:"Quick, free, and worth checking in an irritable radicular presentation because a shift would change the immediate plan. The negative is useful and it takes ten seconds." },
+    { t:"y", lab:"Trunk and hip strength testing beyond the neurological screen", id:"strength",
+      res:"Hip abduction and extension four plus out of five bilaterally, limited by pain rather than by weakness.",
+      why:"Reasonable background information for a later program. It adds little today, and pain-limited strength testing in an irritable patient is hard to interpret." },
+    { t:"r", lab:"Sacroiliac provocation cluster — four tests", id:"sij",
+      res:"None of the four reproduces his familiar symptoms.",
+      why:"Not indicated, and it costs four tests. He has a clear radicular distribution with a neurological deficit, so nothing points at the sacroiliac joint." }
+  ],
+  special:[
+    { t:"g", lab:"Straight leg raise with structural differentiation", id:"slr",
+      res:"Positive on the right at 35 degrees, reproducing calf and foot symptoms. Ankle dorsiflexion increases them.",
+      why:"Between 30 and 70 degrees the straight leg raise loads L4 to S2, which matches his distribution. The structural differentiation is what separates neural tissue from hamstring." },
+    { t:"g", lab:"Crossed straight leg raise", id:"xslr",
+      res:"POSITIVE. Raising the left leg reproduces his right-sided symptoms at 50 degrees.",
+      why:"The most important single finding on this slide. The crossed straight leg raise is highly specific, a positive raises the likelihood of a large disc herniation, and it is a defining criterion of the traction subgroup." },
+    { t:"g", lab:"Slump test", id:"slump",
+      res:"Positive on the right. Symptoms ease when the neck is released from flexion.",
+      why:"Confirms neural mechanosensitivity, and the change with neck position is what distinguishes neural from musculoskeletal pain." },
+    { t:"y", lab:"Prone knee bend", id:"pkb",
+      res:"Negative. No anterior thigh symptoms.",
+      why:"Tests the upper lumbar roots, which his distribution does not implicate. A reasonable completeness check and not a priority." },
+    { t:"y", lab:"Prone instability test", id:"prone",
+      res:"Pain with posterior-to-anterior pressure is unchanged when the legs are lifted.",
+      why:"Performed to exclude the stabilization subgroup. Defensible, though little in his presentation raised it." },
+    { t:"r", lab:"FABER test", id:"faber",
+      res:"Negative bilaterally.",
+      why:"Not indicated. There is no groin ache and no hip question to localize here." }
+  ],
+  impairments:[
+    { t:"g", lab:"S1 nerve root deficit with motor involvement", need:"neuro" , why:"Three findings at one level — plantarflexion 4 out of 5, reduced sensation over the lateral foot, and a diminished Achilles reflex. This is the impairment that sets the monitoring plan and the referral threshold." },
+    { t:"g", lab:"Symptoms peripheralize with extension", need:"repeat" , why:"The finding that classifies him. Peripheralization with no centralization in either direction is what places him in the traction subgroup rather than specific exercise." },
+    { t:"g", lab:"Neural mechanosensitivity", need:["slr","slump"] , why:"A straight leg raise positive at 35 degrees with structural differentiation, and a slump that changes with neck position. Together they place the problem in neural tissue rather than in referred somatic pain." },
+    { t:"y", lab:"Markedly limited and painful lumbar mobility", need:"arom" , why:"Real, and not discriminating. Both directions provoke him, which fits an irritable nerve root rather than a directional problem. It should improve as the root settles rather than needing treatment of its own." },
+    { t:"r", lab:"Directional preference for extension", need:"repeat",
+      why:"The opposite of what you found. Extension made him worse and the change persisted. Selecting this means the repeated movement findings were read backwards." },
+    { t:"r", lab:"Lumbar segmental hypomobility", need:"arom",
+      why:"Not established. Nothing you performed identified a hypomobile painful segment, and his presentation is neural rather than mobility-driven." },
+    { t:"r", lab:"Sacroiliac joint dysfunction", need:"sij",
+      why:"Not present. The cluster was negative and the distribution is radicular." }
+  ],
+  interventions:[
+    { t:"g", lab:"Positional or mechanical traction, with reassessment",
+      why:"He meets all three traction criteria — nerve root signs, symptoms distal to the knee, and peripheralization without centralization. There is a tension worth naming: the CPG gives mechanical traction a Grade D for CHRONIC low back pain with leg pain, and he is six weeks in. Trial it, reassess after one application, and do not commit to a course." },
+    { t:"g", lab:"Serial neurological re-testing at every visit",
+      why:"He has a motor deficit that is currently four out of five. Whether it is static or progressing decides between managing him and referring him, and only repeated measurement can tell you." },
+    { t:"g", lab:"Activity modification to unload the irritable root",
+      why:"Sitting and flexion provoke him, and he has no comfortable direction. Managing exposure is most of what helps in the irritable phase." },
+    { t:"y", lab:"Neural mobilization using sliders",
+      why:"Matched to a nerve root presentation, and sliders are the right choice while irritable. Use it cautiously. Dutton lists a positive crossed straight leg raise among the unfavorable prognostic factors for conservative care of a disc herniation, so expect slower change and keep the dose conservative." },
+    { t:"y", lab:"Education on prognosis and return to work",
+      why:"He is off work and worried, which predicts a slower course. Important, and it will not change his symptoms this week." },
+    { t:"r", lab:"Repeated extension exercise program",
+      why:"Not advised, and this is the trap. Extension is the direction that peripheralizes him. This is the correct intervention for a patient who centralizes and the wrong one for him." },
+    { t:"r", lab:"Thrust manipulation",
+      why:"Not advised. Symptoms distal to the knee, six weeks duration, and an acute motor deficit all argue against it, and he fails the manipulation rule outright." },
+    { t:"r", lab:"Progressive loaded lifting to prepare for work",
+      why:"Not advised at six weeks with an active motor deficit and no directional response. Work capacity is the goal and it is a later phase." }
+  ],
+  outcomes:[
+    { t:"g", lab:"Serial manual muscle test of ankle plantarflexion",
+      why:"The measure that carries the safety question. It is the one finding that could change the plan from rehabilitation to referral, and it is free to re-test." },
+    { t:"g", lab:"Oswestry Disability Index",
+      why:"The condition-specific disability measure, and it captures the work absence that defines his current situation." },
+    { t:"y", lab:"Straight leg raise angle at symptom onset",
+      why:"A reasonable irritability marker that tracks in degrees. It is not a validated outcome measure, so use it as a clinical sign rather than as your headline number." },
+    { t:"y", lab:"Numeric Pain Rating Scale",
+      why:"Meaningful to him and quick. Thin on its own in a case where the deficit matters more than the pain." },
+    { t:"r", lab:"Fear-Avoidance Beliefs Questionnaire as the only measure",
+      why:"Worth administering given the work absence, and not as your only measure. It says nothing about the neurological status that dominates this case." },
+    { t:"r", lab:"Discharge once leg pain resolves",
+      why:"Not advised. Leg pain can resolve while a motor deficit persists. Discharge has to account for the neurological finding and for return to his work demands." }
+  ],
+  discuss:[
+    "This case is the mirror image of a directional preference case. Ask what single finding flips the classification, and what it flips it to.",
+    "His crossed straight leg raise is positive. Ask what that specifically raises and why a positive on a specific test matters more than a positive on a sensitive one.",
+    "He has a motor deficit at four out of five. Ask the room where their referral threshold sits, and what would have to change for them to pick up the phone.",
+    "Ask how many people chose an extension program out of habit. It is the single most common error in this presentation."
+  ]
+},
+{
+  id:"stab", name:"Case 4 — Priya, 26",
+  hyp_key:{
+    most:{ name:"Movement coordination impairment (lumbar instability)",
+      keys:["instabil","stabiliz","stabilis","coordination","motor control","segmental","hypermobil","control"],
+      why:"A fourth episode in eighteen months in a 26-year-old who now guards everything she lifts is the pattern that points toward a movement coordination problem. Recurrence is the signal." },
+    less:[
+      { name:"Nonspecific low back pain", why:"The most common category and it cannot be excluded. It ranks lower because recurrence with a guarding pattern suggests something more specific." },
+      { name:"Lumbar disc or facet involvement", why:"Either could produce recurrent episodes in a young worker who lifts. Worth carrying until movement testing shows which way it behaves." } ],
+    remote:[
+      { name:"Spondylolysis or spondylolisthesis", why:"A young adult with recurrent back pain belongs in the population where a pars lesion is considered. It changes what you would let her load." },
+      { name:"Inflammatory back pain", why:"Dutton recommends screening anyone under 45 with more than three months of symptoms, and her episodes span eighteen months. Ask about morning stiffness over 30 minutes, waking in the second half of the night, and alternating buttock pain." } ],
+    serious:["spondylol","pars","inflammat","spondyloarth","ankylos","fracture","tumor"]
+  },
+  blurb:"Fourth episode in eighteen months. She has started guarding everything she lifts.",
+  stem:{ ctx:"Priya, 26. Veterinary technician. Fourth episode of low back pain in eighteen months, this one four days old.", quote:"“This keeps happening. It settles down and then it comes back a few months later. I have started being careful with everything I lift.”" },
+  subjective:[
+    { id:"loc", label:"Location and referral", text:"Central low back across the beltline, both sides equally. She sweeps a hand across rather than pointing to one spot. No referral into the buttock or leg at all." },
+    { id:"agg", label:"Aggravating factors", text:"Bending and straightening, particularly the moment of coming back up. Lifting from the floor. Sustained sitting is uncomfortable but is not the main problem." },
+    { id:"ease", label:"Easing factors", text:"Lying down eases it. Moving around gently eases it. It has already improved over the four days since it started." },
+    { id:"day", label:"24-hour behavior", text:"Stiff for a few minutes in the morning. Worse by the evening on a busy day. She sleeps through." },
+    { id:"flags", label:"Screening questions", text:"No bowel or bladder change and no saddle numbness. No fever, no weight loss, no cancer history. No trauma beyond lifting the crate." },
+    { id:"neuro", label:"Neurological symptoms", text:"No leg symptoms at all. No numbness, no tingling, no weakness." },
+    { id:"hist", label:"History, work and goals", text:"Fourth episode in eighteen months, each settling in two to three weeks without treatment. Between episodes she is fully active. She wants to stop being afraid of lifting at work." }
+  ],
+  measures:[
+    { t:"g", lab:"Lumbar active range of motion", id:"arom",
+      res:"Full range in every direction. Pain at end-range flexion and on return from it. No lateral shift.",
+      why:"Establishes that range is not her problem, which is worth knowing and is not what classifies her. Measuring how far she moves tells you nothing about how well she moves." },
+    { t:"g", lab:"Repeated movements in extension and flexion", id:"repeat",
+      res:"No lasting change in either direction.",
+      why:"Performed to exclude a directional preference, and the absence is the finding. It removes the specific exercise subgroup." },
+    { t:"g", lab:"Lower quarter neurological screen", id:"neuro",
+      res:"Myotomes five out of five, dermatomes intact, reflexes two plus and symmetric.",
+      why:"Expected normal. It closes the screen and documents a baseline in a young patient with recurrent symptoms." },
+    { t:"y", lab:"Trunk muscle endurance testing", id:"end",
+      res:"Trunk extensor hold 38 seconds. Side bridge 22 seconds right, 19 seconds left.",
+      why:"Below typical values and directly relevant to the program you are about to build. It is not what classifies her, and it is useful for setting a starting point." },
+    { t:"y", lab:"Segmental mobility testing", id:"seg",
+      res:"Increased mobility at L4-5 with pain reproduction. No hypomobile segment identified.",
+      why:"Relevant because hypermobility is a stabilization criterion. Interpret it carefully — segmental mobility judgment has modest reliability, so it supports rather than decides." },
+    { t:"r", lab:"Sacroiliac provocation cluster — four tests", id:"sij",
+      res:"None of the four reproduces her pain.",
+      why:"Not indicated. Her symptoms are central, recurrent and movement-quality related. Nothing points at the sacroiliac joint." }
+  ],
+  special:[
+    { t:"g", lab:"Prone instability test", id:"prone",
+      res:"POSITIVE. Pain with posterior-to-anterior pressure resolves when she lifts her legs and activates.",
+      why:"The strongest single test for this subgroup and the one it is named for. A positive means pain from passive structures is abolished by active muscular support." },
+    { t:"g", lab:"Observation of movement quality through flexion and return", id:"aberrant",
+      res:"A painful arc through mid-flexion, and a Gower sign on the way back up — she pushes on her thighs to straighten. A visible catch near the end of flexion.",
+      why:"The finding that classifies her, and it costs nothing but attention. Dutton lists painful arc, catching, Gower sign and reversal of lumbopelvic rhythm as aberrant movement, and aberrant motion is a factor favoring the stabilization subgroup." },
+    { t:"y", lab:"Straight leg raise range, compared side to side", id:"slrrom",
+      res:"95 degrees on the right, 95 degrees on the left. No side-to-side discrepancy.",
+      why:"More relevant than it looks. The Hicks stabilization rule uses an average straight leg raise above 91 degrees, and she is at 95. Dutton’s classification table also lists greater straight leg raise range as a factor FAVORING stabilization and a side-to-side discrepancy over 10 degrees as a factor against it. She has the first and not the second." },
+        { t:"r", lab:"Crossed straight leg raise", id:"xslr",
+      res:"Negative.",
+      why:"Not indicated. She has no leg symptoms at all, so there is no radicular hypothesis for a specific neural test to address." },
+    { t:"y", lab:"Passive lumbar extension test", id:"ple",
+      res:"POSITIVE. Low back pain and a sense of the back giving way when both legs are lifted, resolving when they are lowered.",
+      why:"Taught as one of the more useful tests for structural lumbar segmental instability, and it supports the picture. It ranks below the prone instability test and movement observation because those are the findings the stabilization rule is built on." },
+    { t:"r", lab:"Slump test", id:"slump",
+      res:"Negative.",
+      why:"Not indicated, for the same reason, and it duplicates a straight leg raise that was already unnecessary." }
+  ],
+  impairments:[
+    { t:"g", lab:"Aberrant movement with poor motor control", need:"aberrant" , why:"Painful arc, Gower sign, and a catch on return from flexion. Dutton lists aberrant motion as a factor favoring the stabilization subgroup, and it is precisely the finding her normal range of motion would have hidden." },
+    { t:"g", lab:"Deficient active segmental control", need:["prone"] , why:"Her pain on posterior-to-anterior pressure resolves when she activates. That is the impairment the prone instability test is built to expose, and it is directly trainable." },
+    { t:"y", lab:"Reduced trunk muscle endurance", need:"end" , why:"Below typical values and directly relevant to the program you will build. A contributor rather than what classifies her, and endurance matters more than peak strength here." },
+    { t:"y", lab:"Segmental hypermobility at L4-5", need:["seg","ple"] , why:"Increased mobility with pain reproduction at the symptomatic level. Interpret it carefully, since segmental mobility judgment has modest reliability — but it supports the picture and it is the reason thrust is the wrong technique." },
+    { t:"r", lab:"Directional preference", need:"repeat",
+      why:"Not present. Repeated movements produced no lasting change in either direction, which is precisely why she is not a specific exercise case." },
+    { t:"r", lab:"Lumbar radiculopathy", need:"neuro",
+      why:"Not present. She has no leg symptoms and a normal neurological screen." },
+    { t:"r", lab:"Segmental hypomobility requiring manipulation", need:"seg",
+      why:"The opposite of what you found. She is hypermobile at the symptomatic level, not restricted." }
+  ],
+  interventions:[
+    { t:"g", lab:"Motor control training, progressed to functional loading",
+      why:"The matched intervention for this subgroup. Start with isolated activation, progress deliberately to the lifting patterns her job demands rather than staying in supine forever." },
+    { t:"g", lab:"Lifting technique retraining using her work tasks",
+      why:"Her goal is to stop being afraid of lifting at work, and the crate is the task that triggered this episode. Training the specific pattern is both the intervention and the exposure." },
+    { t:"g", lab:"Education on recurrence and what it does and does not mean",
+      why:"Four episodes in eighteen months has taught her that her back is unreliable. Reframing recurrence as common and manageable addresses the bracing behavior you observed." },
+    { t:"y", lab:"Trunk endurance training",
+      why:"Addresses a measured impairment if you tested it, and endurance matters more than strength here. It is one component of motor control work rather than a substitute for it." },
+    { t:"y", lab:"Manual therapy for pain modulation in the first week",
+      why:"Defensible for an acute painful episode, and it opens a window for the active work. It is not the treatment, and a patient who is hypermobile should not be receiving it as a primary intervention." },
+    { t:"r", lab:"End-range thrust manipulation at L4-5",
+      why:"Not advised on two counts. She is hypermobile at the symptomatic segment, so thrust addresses a restriction she does not have. Dutton also lists increasing episode frequency as a factor AGAINST the manipulation subgroup, and this is her fourth episode in eighteen months." },
+    { t:"r", lab:"Directional preference exercise",
+      why:"Not advised. Repeated movements produced no directional response, so there is no direction to prescribe." },
+    { t:"r", lab:"Rest and bracing until the episode settles",
+      why:"Not advised. She already braces before she moves, and a lumbar support reinforces the belief that her spine needs external protection. Previous episodes settled on their own; the goal is fewer of them." }
+  ],
+  outcomes:[
+    { t:"g", lab:"Oswestry Disability Index",
+      why:"The condition-specific disability measure, and a baseline worth having across recurrent episodes so you can compare this one with the next." },
+    { t:"g", lab:"Patient-Specific Functional Scale",
+      why:"Captures lifting crates and the confidence goal in her own words. In a recurrence case, the functional items matter more than the symptom items." },
+    { t:"y", lab:"Trunk endurance hold times",
+      why:"An impairment measure that tracks the program directly. It is not a patient-reported outcome, so it belongs alongside one rather than instead of it." },
+    { t:"y", lab:"Numeric Pain Rating Scale",
+      why:"Quick and meaningful, and her problem is recurrence and confidence rather than current pain level." },
+    { t:"r", lab:"Repeat prone instability test as the discharge criterion",
+      why:"Not advised. It is a diagnostic test rather than an outcome measure and it was never designed to track change." },
+    { t:"r", lab:"Discharge when this episode settles",
+      why:"Not advised, and it is what happened the previous three times. The episode will settle on its own; the point of treatment is to change what happens next." }
+  ],
+  discuss:[
+    "Her range of motion is completely normal. Ask what you would have missed by measuring range and not watching quality.",
+    "Three of her four stabilization criteria come from observation and one simple test. Ask how much of this examination needed equipment.",
+    "Her previous three episodes resolved without treatment. Ask what that means for how you judge whether your treatment worked.",
+    "She braces before she moves. Ask whether that is protective or part of the problem, and what would change your answer."
+  ]
+}
+];
+
+const WARM = [
+  { v:"27-year-old, low back pain for 6 days after shoveling. No symptoms below the knee. Fear-avoidance work score 9. L4–5 hypomobile and painful on spring testing. Hip internal rotation 44 degrees.",
+    a:0, why:"Five of five on the manipulation rule — under 16 days, nothing distal to the knee, fear-avoidance under 19, a hypomobile segment, and a hip over 35 degrees. Four of five raises the chance of success with thrust from about 45% to 95%." },
+  { v:"41-year-old, 5 weeks of back and right posterior thigh pain. Repeated extension in standing abolishes the thigh pain and it stays gone. Repeated flexion brings it back.",
+    a:1, why:"One finding decides it: symptoms centralize with a tested direction and the change is maintained. Duration and the presence of thigh pain are irrelevant once a directional preference is demonstrated." },
+  { v:"29-year-old, fourth episode in two years. Aberrant movement returning from flexion. Positive prone instability test. No leg symptoms. Reports a feeling of the back 'giving way'.",
+    a:2, why:"Name what he has: younger age, aberrant movement on return from flexion, and a positive prone instability test, in a back that has given way four times in two years. The movement findings are what classify him — the recurrence is the reason he is in front of you." },
+  { v:"52-year-old, 8 weeks of back pain with right calf symptoms and numbness over the dorsum of the foot. Great toe extension 4 out of 5. Repeated extension makes the calf symptoms worse and they stay worse.",
+    a:3, why:"Signs of nerve root compression, symptoms distal to the knee, and symptoms that peripheralize with motion without centralizing. All three traction criteria are met. Note the evidence caution: mechanical traction carries a Grade D recommendation for chronic low back pain with leg pain. At eight weeks he is not yet chronic, so trial it and reassess rather than committing to a course." },
+  { v:"35-year-old, 10 days of low back pain with right buttock symptoms after a long drive. Fear-avoidance work score 26. Segmental testing unremarkable. Hip internal rotation 30 degrees bilaterally. Repeated extension in standing abolishes the buttock pain and it stays gone.",
+    a:1, why:"A trap. Recent onset looks like manipulation, but he fails three of its five criteria — fear-avoidance over 19, no hypomobile segment, and neither hip over 35 degrees. Meanwhile he centralizes with a tested direction, which is the single finding that defines specific exercise. When a patient fails one subgroup and meets another, the one he meets wins." },
+  { v:"31-year-old, 8 days of low back pain after a heavy gym session. No symptoms below the knee. Fear-avoidance work score 11. Hip internal rotation 40 degrees. Painful arc on return from flexion. Spring testing reveals hypermobility at L4–5 with pain reproduction.",
+    a:2, why:"The hardest item here. Four manipulation criteria are met — recent onset, nothing below the knee, fear-avoidance under 19, and a hip over 35 degrees — so it reads as a manipulation case on the surface. But the manipulation rule requires HYPOmobility on spring testing and he is HYPERmobile. Add the aberrant movement and it is stabilization. One segmental finding flips the whole answer." },
+  { v:"45-year-old, 3 months of low back pain with referral into the right buttock. No aberrant movement, negative prone instability test. Repeated flexion in lying abolishes the buttock pain and it stays gone.",
+    a:1, why:"The direction is flexion, not extension. The subgroup is defined by centralization with a tested direction, whichever direction that turns out to be, and centralization requires referred symptoms to retreat. Students default to extension because that is the example they were taught." },
+  { v:"38-year-old, 2 weeks of back pain with intermittent buttock pain to the mid-thigh. No neurological signs. Repeated movements in every direction produce no lasting change. Segmental testing reveals a hypomobile painful L4–5. Fear-avoidance work score 12.",
+    a:0, why:"No directional response, so specific exercise is out. No instability findings, so stabilization is out. No nerve root signs, so traction is out. Under 16 days, nothing below the knee, low fear-avoidance and a hypomobile segment leave manipulation — and buttock-to-mid-thigh pain is not 'distal to the knee'." }
+];
+const SUBS=['Manipulation','Specific exercise','Stabilization','Traction'];
+let wi=0, wAns=[];
+
+const TOPIC_KEYS={
+  loc:["where","locat","point","show me","radiat","travel","spread","below the knee","refer","area","exactly is"],
+  agg:["worse","aggravat","provoke","bring it on","brings it on","what makes it worse","flare","trigger","hurt more","increase"],
+  ease:["better","ease","eas","relie","help","settle","improve","comfortable","reduce"],
+  day:["morning","night","sleep","evening","wake","24","day go","end of the day","through the day","first thing","at rest"],
+  flags:["red flag","bowel","bladder","saddle","weight","fever","cancer","night sweat","trauma","fall","steroid","unwell","screen","systemic"],
+  neuro:["numb","tingl","weak","pins","needles","sensation","nerve","foot drop","strength","give way","drop"],
+  hist:["work","job","occupation","goal","living","previous","prior","episode","history","before","how long","duration","activity","want to","hobby","sport","exercise"]
+};
+const TIERNAME={g:"Strong choice",y:"Acceptable",r:"Not advised"};
+let C=null, si=0, picks={}, text={}, hyp=["","",""], qs=["","",""], elicited=[], notAsked=[], revealed=false;
+
+const STEPS=[
+  {k:"stem",lab:"Referral"},{k:"stands",lab:"Stands out"},{k:"hypotheses",lab:"Hypotheses"},
+  {k:"questions",lab:"Questions"},{k:"subjective",lab:"Subjective"},
+  {k:"measures",lab:"Measures",pick:2},{k:"special",lab:"Special tests",pick:2},
+  {k:"impairments",lab:"Impairments",pick:3},{k:"interventions",lab:"Plan",pick:3},
+  {k:"outcomes",lab:"Outcome",pick:1},{k:"summary",lab:"Summary"}
+];
+
+
+function shuffle(a){
+  const out=a.slice();
+  for(let i=out.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [out[i],out[j]]=[out[j],out[i]]; }
+  return out;
+}
+// Options are authored grouped by tier. Shuffle once per run so position carries no signal.
+function prepCase(c){
+  const copy=Object.assign({},c);
+  ['measures','special','impairments','interventions','outcomes'].forEach(k=>{
+    if(Array.isArray(copy[k])) copy[k]=shuffle(copy[k]);
+  });
+  return copy;
+}
+
+const bar=document.getElementById('bar'), stage=document.getElementById('stage');
+
+function drawBar(){
+  bar.innerHTML='';
+  if(!C) return;
+  STEPS.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='step'+(i===si?' on':(i<si?' done':''));
+    d.textContent=s.lab; bar.appendChild(d);
+  });
+}
+
+
+function warmIntro(){
+  bar.innerHTML='';
+  document.getElementById('h1').textContent='Reasoning Cases';
+  document.getElementById('hsub').textContent='Start with a two-minute warm-up on the four treatment-based subgroups, then choose a case.';
+  stage.innerHTML='';
+  const v=document.createElement('div'); v.className='vig';
+  v.innerHTML='<h3>Warm-up: classification sorter</h3>'+
+    '<p>Eight short presentations. Sort each into a treatment-based subgroup — manipulation, specific exercise, stabilization, or traction.</p>'+
+    '<p>About two minutes. Feedback after every answer. Three of the eight are deliberate traps.</p>';
+  stage.appendChild(v);
+  const a=document.createElement('div'); a.className='act';
+  const b=document.createElement('button'); b.className='go'; b.textContent='Start the warm-up';
+  b.onclick=()=>{ wi=0; wAns=[]; warmItem(); window.scrollTo(0,0); }; a.appendChild(b);
+  const k=document.createElement('button'); k.className='go ghost'; k.textContent='Skip to the cases';
+  k.onclick=()=>{ pickCase(); window.scrollTo(0,0); }; a.appendChild(k);
+  stage.appendChild(a);
+}
+
+function warmItem(){
+  bar.innerHTML='';
+  WARM.forEach((w,k)=>{ const d=document.createElement('div');
+    d.className='step'+(k===wi?' on':(k<wi?' done':'')); d.textContent=String(k+1); bar.appendChild(d); });
+  document.getElementById('h1').textContent='Warm-up: Classification Sorter';
+  document.getElementById('hsub').textContent='Case '+(wi+1)+' of '+WARM.length+'. Which treatment-based subgroup?';
+  const c=WARM[wi];
+  stage.innerHTML='';
+  const v=document.createElement('div'); v.className='vig'; const p=document.createElement('p'); p.textContent=c.v; v.appendChild(p); stage.appendChild(v);
+  const wrap=document.createElement('div');
+  SUBS.forEach((sub,k)=>{
+    const b=document.createElement('button'); b.className='opt'; b.type='button'; b.textContent=sub;
+    b.onclick=()=>{
+      const ok=(k===c.a); wAns[wi]=ok;
+      [...wrap.children].forEach((x,idx)=>{ x.disabled=true;
+        if(idx===c.a){ x.style.borderColor='var(--g)'; x.style.background='var(--gbg)'; }
+        else if(idx===k){ x.style.borderColor='var(--r)'; x.style.background='var(--rbg)'; }
+        else x.style.opacity='.45'; });
+      const f=document.createElement('div'); f.className='sumrow '+(ok?'g':'r');
+      f.innerHTML='<b>'+(ok?'Correct':'Not this one — '+SUBS[c.a])+'</b><span class="why">'+c.why+'</span>';
+      stage.appendChild(f);
+      const a=document.createElement('div'); a.className='act';
+      const n=document.createElement('button'); n.className='go';
+      n.textContent = wi===WARM.length-1 ? 'See your warm-up score' : 'Next';
+      n.onclick=()=>{ wi++; if(wi>=WARM.length) warmDone(); else warmItem(); window.scrollTo(0,0); };
+      a.appendChild(n); stage.appendChild(a);
+    };
+    wrap.appendChild(b);
+  });
+  stage.appendChild(wrap);
+}
+
+function warmDone(){
+  bar.innerHTML='';
+  const n=wAns.filter(Boolean).length;
+  document.getElementById('h1').textContent='Warm-up complete';
+  document.getElementById('hsub').textContent=n+' of '+WARM.length+' correct. Now choose a case.';
+  stage.innerHTML='';
+  const v=document.createElement('div'); v.className='vig';
+  v.innerHTML='<h3>'+n+' of '+WARM.length+'</h3><p>'+
+    (n>=7?'Strong. You are sorting on criteria rather than on impressions.'
+     :n>=5?'Solid. The ones you missed are usually the traps rather than the clear cases.'
+     :'Worth keeping the four subgroups in mind as you work the case — the criteria matter more than the presentation.')+
+    '</p><p>We will talk through the traps together when everyone is back.</p>';
+  stage.appendChild(v);
+  const a=document.createElement('div'); a.className='act';
+  const b=document.createElement('button'); b.className='go'; b.textContent='Choose your case';
+  b.onclick=()=>{ pickCase(); window.scrollTo(0,0); }; a.appendChild(b);
+  stage.appendChild(a);
+}
+
+function pickCase(){
+  bar.innerHTML='';
+  document.getElementById('h1').textContent='Reasoning Cases';
+  document.getElementById('hsub').textContent='Four cases. Each runs from presentation to outcome measure. Choose one to begin.';
+  stage.innerHTML='';
+  const g=document.createElement('div'); g.className='pick';
+  CASES.forEach((c,i)=>{
+    const a=document.createElement('a'); a.className='case'; a.href='#';
+    a.innerHTML='<div class="t">'+c.name+'</div><div class="d">'+c.blurb+'</div>';
+    a.onclick=(e)=>{ e.preventDefault(); C=prepCase(c); si=0; picks={}; text={}; hyp=["","",""]; qs=["","",""]; elicited=[]; notAsked=[]; revealed=false; render(); window.scrollTo(0,0); };
+    g.appendChild(a);
+  });
+  stage.appendChild(g);
+}
+
+function render(){
+  drawBar();
+  document.getElementById('h1').textContent=C.name;
+  document.getElementById('hsub').textContent='Your written answers are yours. Your selections are scored at the end.';
+  const st=STEPS[si];
+  stage.innerHTML='';
+  if(st.k==='stem') return renderStem();
+  if(st.k==='stands') return renderStands();
+  if(st.k==='hypotheses') return renderHyp();
+  if(st.k==='questions') return renderQuestions();
+  if(st.k==='subjective') return renderSubjective();
+  if(st.k==='summary') return renderSummary();
+  return renderPick(st);
+}
+
+function nextBtn(label,ok){
+  const act=document.createElement('div'); act.className='act';
+  const b=document.createElement('button'); b.className='go'; b.id='next';
+  b.textContent=label||'Continue'; b.disabled=(ok===false);
+  b.onclick=()=>{ si++; render(); window.scrollTo(0,0); };
+  act.appendChild(b);
+  if(si>0){
+    const back=document.createElement('button'); back.className='go ghost'; back.textContent='Back';
+    back.onclick=()=>{ si--; render(); window.scrollTo(0,0); };
+    act.appendChild(back);
+  }
+  stage.appendChild(act);
+  return b;
+}
+
+function renderStem(){
+  const h=document.createElement('h2'); h.textContent='The referral'; stage.appendChild(h);
+  const v=document.createElement('div'); v.className='vig';
+  const t=document.createElement('h3'); t.textContent='This is all you have so far'; v.appendChild(t);
+  const c=document.createElement('p'); c.textContent=C.stem.ctx; v.appendChild(c);
+  const q=document.createElement('p'); q.className='quote'; q.textContent=C.stem.quote; v.appendChild(q);
+  stage.appendChild(v);
+  const n=document.createElement('p'); n.className='meta';
+  n.textContent='You will get the rest of the subjective examination — but only after you have decided what you would ask for.';
+  stage.appendChild(n);
+  nextBtn('Begin');
+}
+
+function renderQuestions(){
+  const h=document.createElement('h2'); h.textContent='Your first three questions'; stage.appendChild(h);
+  const t=document.createElement('div'); t.className='task';
+  t.innerHTML='<p>Name the three subjective questions you would ask first.</p>'+
+    '<p class="small">Choose for yield. Each one should be capable of moving one of the hypotheses you just wrote.</p>';
+  stage.appendChild(t);
+  if(hyp.filter(x=>x.trim()).length){
+    const r=document.createElement('div'); r.className='vig';
+    const rh=document.createElement('h3'); rh.textContent='Your hypotheses, for reference'; r.appendChild(rh);
+    const HL=['Most likely','Less likely','Remote'];
+    hyp.forEach((x,i)=>{ if(!x.trim())return; const p=document.createElement('p');
+      p.textContent=HL[i]+' — '+x; r.appendChild(p); });
+    stage.appendChild(r);
+  }
+  ['Question 1','Question 2','Question 3'].forEach((l,i)=>{
+    const lb=document.createElement('label'); lb.className='fl'; lb.textContent=l; stage.appendChild(lb);
+    const inp=document.createElement('input'); inp.type='text'; inp.value=qs[i]||'';
+    inp.placeholder='What would you ask, and it should be one question';
+    inp.oninput=()=>{ qs[i]=inp.value; b.disabled=qs.filter(x=>x.trim()).length<1; };
+    stage.appendChild(inp);
+  });
+  const b=nextBtn('See the subjective examination', qs.filter(x=>x.trim()).length>=1);
+}
+
+function matchTopics(){
+  const hit=new Set();
+  qs.forEach(q=>{
+    const t=(q||'').toLowerCase();
+    if(!t.trim()) return;
+    Object.keys(TOPIC_KEYS).forEach(k=>{
+      if(TOPIC_KEYS[k].some(w=>t.includes(w))) hit.add(k);
+    });
+  });
+  return hit;
+}
+
+function renderSubjective(){
+  const h=document.createElement('h2'); h.textContent='What your questions found'; stage.appendChild(h);
+  const hit=matchTopics();
+  const got=C.subjective.filter(x=>hit.has(x.id));
+  const miss=C.subjective.filter(x=>!hit.has(x.id));
+  elicited=got.map(x=>x.label); notAsked=miss.map(x=>x.label);
+
+  const n=document.createElement('p'); n.className='meta';
+  n.textContent = got.length
+    ? 'She answered what you asked. Everything else she has not volunteered.'
+    : 'Your questions did not elicit anything she could answer directly. That happens with questions that are too open or too narrow.';
+  stage.appendChild(n);
+
+  if(got.length){
+    const v=document.createElement('div'); v.className='vig';
+    const t=document.createElement('h3'); t.textContent='What you elicited'; v.appendChild(t);
+    got.forEach(x=>{
+      const lb=document.createElement('p'); lb.style.cssText='font-weight:600;color:var(--navy);margin-bottom:2px';
+      lb.textContent=x.label; v.appendChild(lb);
+      const el=document.createElement('p'); el.textContent=x.text; v.appendChild(el);
+    });
+    stage.appendChild(v);
+  }
+
+  if(miss.length){
+    const box=document.createElement('div'); box.className='vig';
+    const t=document.createElement('h3'); t.textContent='You did not ask about'; box.appendChild(t);
+    const l=document.createElement('p'); l.textContent=miss.map(x=>x.label).join(' · ');
+    box.appendChild(l);
+    const b=document.createElement('button'); b.className='go ghost'; b.style.marginTop='10px';
+    b.textContent='Reveal what you did not ask for';
+    b.onclick=()=>{
+      b.remove(); revealed=true;
+      miss.forEach(x=>{
+        const lb=document.createElement('p'); lb.style.cssText='font-weight:600;color:var(--muted);margin-bottom:2px';
+        lb.textContent=x.label; box.appendChild(lb);
+        const el=document.createElement('p'); el.style.opacity='.85'; el.textContent=x.text; box.appendChild(el);
+      });
+      const note=document.createElement('p'); note.className='meta'; note.style.marginTop='10px';
+      note.textContent='Noted in your summary. In clinic nobody hands you this.';
+      box.appendChild(note);
+    };
+    box.appendChild(b);
+    stage.appendChild(box);
+  }
+  nextBtn('Continue to the examination');
+}
+
+function renderStands(){
+  const h=document.createElement('h2'); h.textContent='What stands out?'; stage.appendChild(h);
+  const t=document.createElement('div'); t.className='task';
+  t.innerHTML='<p>Before you think about a diagnosis, what stands out to you in this presentation?</p>'+
+    '<p class="small">Write freely. Nobody marks this — it is what you will compare against the group.</p>';
+  stage.appendChild(t);
+  const ta=document.createElement('textarea');
+  ta.value=text.stands||''; ta.placeholder='The findings that caught your attention, and why...';
+  ta.oninput=()=>{ text.stands=ta.value; };
+  stage.appendChild(ta);
+  nextBtn();
+}
+
+function renderHyp(){
+  const h=document.createElement('h2'); h.textContent='Your initial hypotheses'; stage.appendChild(h);
+  const t=document.createElement('div'); t.className='task';
+  t.innerHTML='<p>Name three hypotheses you are carrying into the examination.</p>'+
+    '<p class="small">Rank them from most likely to remote. You will see these again at the end, next to what the examination found.</p>';
+  stage.appendChild(t);
+  ['Most likely','Less likely','Remote'].forEach((l,i)=>{
+    const lb=document.createElement('label'); lb.className='fl'; lb.textContent=l; stage.appendChild(lb);
+    const inp=document.createElement('input'); inp.type='text'; inp.value=hyp[i]||'';
+    inp.placeholder=['The one you would bet on','Plausible, and not your first call','Unlikely, but you are not ready to close it'][i];
+    inp.oninput=()=>{ hyp[i]=inp.value; upd(); };
+    stage.appendChild(inp);
+  });
+  const b=nextBtn('Continue', hyp.filter(x=>x.trim()).length>=1);
+  function upd(){ b.disabled = hyp.filter(x=>x.trim()).length<1; }
+}
+
+function renderPick(st){
+  const items=C[st.k];
+  picks[st.k]=picks[st.k]||[];
+  const need=Math.max(1,Math.min(st.pick, items.length-1));
+  const TITLES={measures:'Choose your tests and measures',special:'Choose your special tests',
+    impairments:'Identify the impairments',interventions:'Choose your interventions',outcomes:'Choose an outcome measure'};
+  const TASKS={
+    measures:'Which TWO tests and measures do you perform first?',
+    special:'Which TWO special tests do you perform?',
+    impairments:'Based on what you found, identify THREE impairments.',
+    interventions:'Choose THREE interventions for the first visit.',
+    outcomes:'Choose ONE outcome measure to track her progress.'};
+  const HINTS={
+    measures:'You will see the result of anything you choose.',
+    special:'Choose for what a positive AND a negative would each tell you.',
+    impairments:'Only choose what your examination actually showed you.',
+    interventions:'Match the intervention to the finding, not to the diagnosis.',
+    outcomes:'One measure. Make it the one that matches the problem.'};
+  const h=document.createElement('h2'); h.textContent=TITLES[st.k]; stage.appendChild(h);
+  const t=document.createElement('div'); t.className='task';
+  t.innerHTML='<p>'+TASKS[st.k]+'</p><p class="small">'+HINTS[st.k]+'</p>';
+  stage.appendChild(t);
+  const m=document.createElement('p'); m.className='meta'; m.id='counter'; stage.appendChild(m);
+  items.forEach((it,idx)=>{
+    const b=document.createElement('button'); b.className='opt'; b.type='button';
+    b.setAttribute('aria-pressed', picks[st.k].includes(idx)?'true':'false');
+    const l=document.createElement('span'); l.className='lab'; l.textContent=it.lab; b.appendChild(l);
+    b.onclick=()=>{
+      const arr=picks[st.k], at=arr.indexOf(idx);
+      if(at>=0){ arr.splice(at,1); b.setAttribute('aria-pressed','false');
+        const r=b.querySelector('.res'); if(r) r.remove(); }
+      else { if(arr.length>=need) return; arr.push(idx); b.setAttribute('aria-pressed','true');
+        if(it.res){ const r=document.createElement('div'); r.className='res';
+          r.innerHTML='<b>Result</b>'+it.res; b.appendChild(r); } }
+      count();
+    };
+    stage.appendChild(b);
+    if(picks[st.k].includes(idx) && it.res){
+      const r=document.createElement('div'); r.className='res'; r.innerHTML='<b>Result</b>'+it.res; b.appendChild(r);
+    }
+  });
+  const btn=nextBtn(si===STEPS.length-2?'See summary':'Continue', picks[st.k].length>=need);
+  count();
+  function count(){
+    const n=picks[st.k].length;
+    document.getElementById('counter').textContent=n+' of '+need+' selected'+(n<need?' — select '+(need-n)+' more.':'');
+    btn.disabled=n<need;
+  }
+}
+
+function tierOf(k,i){ return C[k][i].t; }
+
+function renderSummary(){
+  stage.innerHTML='';
+  const h=document.createElement('h2'); h.textContent='Your summary'; stage.appendChild(h);
+
+  // impairments chosen without the test that would reveal them
+  const testedIds=[];
+  (picks.measures||[]).forEach(i=>testedIds.push(C.measures[i].id));
+  (picks.special||[]).forEach(i=>testedIds.push(C.special[i].id));
+  const unfounded=(picks.impairments||[]).map(i=>C.impairments[i])
+    .filter(im=>{
+      if(!im.need) return false;
+      const req = Array.isArray(im.need) ? im.need : [im.need];
+      return !req.some(r=>testedIds.includes(r));
+    });
+  if(unfounded.length){
+    const w=document.createElement('div'); w.className='warn';
+    w.innerHTML='<b>Impairments you named but never tested for</b>'+
+      unfounded.map(u=>u.lab).join('; ')+
+      '. You may well be right. But you did not perform the test that would have shown it, so at this point it is an assumption rather than a finding — and that is the distinction worth defending in the discussion.';
+    stage.appendChild(w);
+  }
+
+  const sec=(title,node)=>{ const d=document.createElement('div'); d.className='sumsec';
+    const t=document.createElement('h3'); t.textContent=title; d.appendChild(t); d.appendChild(node); stage.appendChild(d); };
+
+  if(text.stands && text.stands.trim()){
+    const d=document.createElement('div'); d.className='yours'; d.textContent=text.stands;
+    sec('What you said stood out', d);
+  }
+  if(hyp.filter(x=>x.trim()).length){
+    const d=document.createElement('div');
+    const HLAB=['Most likely','Less likely','Remote'];
+    hyp.forEach((x,i)=>{ if(!x.trim())return; const p=document.createElement('div'); p.className='yours';
+      p.textContent=HLAB[i]+' — '+x; d.appendChild(p); });
+    sec('Your hypotheses', d);
+
+    const K=C.hyp_key, low=hyp.map(x=>(x||'').toLowerCase());
+    const hit=(k,x)=> k.length<=4 ? new RegExp('\\b'+k+'\\b').test(x) : x.includes(k);
+    const hasTop = K.most.keys.some(k=>low.some(x=>hit(k,x)));
+    const topFirst = K.most.keys.some(k=>hit(k,low[0]));
+    const hasSerious = K.serious.some(k=>low.some(x=>hit(k,x)));
+    const fb=document.createElement('div');
+
+    const r1=document.createElement('div');
+    r1.className='sumrow '+(topFirst?'g':(hasTop?'y':'r'));
+    r1.innerHTML='<b>'+(topFirst?'Your top hypothesis matched what the referral most supported'
+                  :hasTop?'You named it, but not first'
+                  :'The referral most supported something you did not list')+'</b>'+
+      '<span class="why"><b style="display:inline;color:inherit">'+K.most.name+'.</b> '+K.most.why+'</span>';
+    fb.appendChild(r1);
+
+    const r2=document.createElement('div');
+    r2.className='sumrow '+(hasSerious?'g':'y');
+    r2.innerHTML='<b>'+(hasSerious?'You kept something serious in view':'Nothing serious made your list')+'</b>'+
+      '<span class="why">'+(hasSerious?'Good. ':'Worth one slot every time. ')+
+      'Three hypotheses is enough room for the likely answer, a plausible alternative, and the one you cannot afford to miss.</span>';
+    fb.appendChild(r2);
+
+    const tbl=document.createElement('div'); tbl.className='sumrow n';
+    tbl.innerHTML='<b>What a strong list from this referral looks like</b>'+
+      '<span class="why"><b style="display:inline;color:inherit">Most likely — </b>'+K.most.name+'</span>'+
+      K.less.map(x=>'<span class="why"><b style="display:inline;color:inherit">Less likely — </b>'+x.name+'. '+x.why+'</span>').join('')+
+      K.remote.map(x=>'<span class="why"><b style="display:inline;color:inherit">Remote — </b>'+x.name+'. '+x.why+'</span>').join('')+
+      '<span class="why" style="margin-top:9px;font-style:italic">This is judged against the referral alone — the only information you had when you wrote your list. There is no single correct set; the question is whether yours matched the evidence at that moment.</span>';
+    fb.appendChild(tbl);
+    sec('How your hypotheses compare', fb);
+  }
+  if(qs.filter(x=>x.trim()).length){
+    const d=document.createElement('div');
+    qs.forEach((x,i)=>{ if(!x.trim())return; const p=document.createElement('div'); p.className='yours';
+      p.textContent=(i+1)+'. '+x; d.appendChild(p); });
+    if(elicited.length){
+      const r=document.createElement('div'); r.className='sumrow g';
+      r.innerHTML='<b>Your questions elicited</b><span class="why">'+elicited.join(' · ')+'</span>';
+      d.appendChild(r);
+    }
+    if(notAsked.length){
+      const r=document.createElement('div'); r.className='sumrow '+(revealed?'y':'r');
+      r.innerHTML='<b>'+(revealed?'You were given, without asking':'You never found out about')+'</b>'+
+        '<span class="why">'+notAsked.join(' · ')+
+        '. Three questions cannot cover seven areas — the point is whether the three you chose were the three this patient needed.</span>';
+      d.appendChild(r);
+    }
+    sec('The questions you asked', d);
+  }
+
+  let g=0,y=0,r=0;
+  ['measures','special','impairments','interventions','outcomes'].forEach(k=>{
+    const LABEL={measures:'Tests and measures',special:'Special tests',impairments:'Impairments',
+      interventions:'Interventions',outcomes:'Outcome measure'}[k];
+    const d=document.createElement('div');
+    (picks[k]||[]).forEach(i=>{
+      const it=C[k][i]; const t=it.t;
+      if(t==='g')g++; else if(t==='y')y++; else if(t==='r')r++;
+      const row=document.createElement('div'); row.className='sumrow '+t;
+      row.innerHTML='<b>'+it.lab+'</b> — '+TIERNAME[t]+
+        (it.why?'<span class="why">'+it.why+'</span>':'');
+      d.appendChild(row);
+    });
+    const missed=C[k].map((it,i)=>({it,i})).filter(o=>o.it.t==='g' && !(picks[k]||[]).includes(o.i));
+    if(missed.length){
+      const row=document.createElement('div'); row.className='sumrow n';
+      row.innerHTML='<b>Strong choices you did not take</b><span class="why">'+
+        missed.map(o=>o.it.lab).join(' &nbsp;·&nbsp; ')+'</span>';
+      d.appendChild(row);
+    }
+    sec(LABEL, d);
+  });
+
+  const sc=document.createElement('div'); sc.className='sumrow n';
+  sc.innerHTML='<b>'+g+' strong &nbsp;·&nbsp; '+y+' acceptable &nbsp;·&nbsp; '+r+' not advised</b>'+
+    '<span class="why">Scoring is a prompt for discussion, not a grade. The interesting conversations are about the yellows and about anything you would defend.</span>';
+  stage.insertBefore(sc, stage.children[1]);
+
+  const disc=document.createElement('div'); disc.className='disc';
+  const dh=document.createElement('h3'); dh.textContent='We will talk this through together'; disc.appendChild(dh);
+  const ul=document.createElement('ul');
+  C.discuss.forEach(x=>{ const li=document.createElement('li'); li.textContent=x; ul.appendChild(li); });
+  disc.appendChild(ul); stage.appendChild(disc);
+
+  const act=document.createElement('div'); act.className='act';
+  const pr=document.createElement('button'); pr.className='go'; pr.textContent='Print for your own notes';
+  pr.onclick=()=>window.print(); act.appendChild(pr);
+  const again=document.createElement('button'); again.className='go ghost'; again.textContent='Choose another case';
+  again.onclick=()=>{ C=null; pickCase(); window.scrollTo(0,0); }; act.appendChild(again);
+  stage.appendChild(act);
+}
+
+warmIntro();
+</script>
+</body>
+</html>
