@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Cases, Start to Finish — DPHT 7441 Module 5</title>
+<style>
+  :root{ --navy:#012D46; --teal:#00778B; --ink:#1F2933; --muted:#5A6570;
+    --line:#D7DDE2; --tint:#F2F6F8; --tint2:#E8EFF2; --bg:#FFFFFF; --panel:#FFFFFF;
+    --g:#1B7F4B; --gbg:#E6F2EA; --y:#9A6700; --ybg:#FBF2DF; --r:#B3261E; --rbg:#FBEAE8; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --navy:#8FC6DA; --teal:#4FB3C7; --ink:#E8EDF1; --muted:#9BA7B2;
+      --line:#2A3946; --tint:#16222C; --tint2:#1B2A36; --bg:#0E171F; --panel:#13202A;
+      --gbg:#14301F; --ybg:#31270F; --rbg:#37191A; --g:#6ED08F; --y:#E2B44C; --r:#F09189; } }
+  :root[data-theme="dark"]{ --navy:#8FC6DA; --teal:#4FB3C7; --ink:#E8EDF1; --muted:#9BA7B2;
+    --line:#2A3946; --tint:#16222C; --tint2:#1B2A36; --bg:#0E171F; --panel:#13202A;
+    --gbg:#14301F; --ybg:#31270F; --rbg:#37191A; --g:#6ED08F; --y:#E2B44C; --r:#F09189; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Calibri,system-ui,-apple-system,sans-serif;line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:24px 18px 80px}
+  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+  .kick{font-size:11px;font-weight:700;letter-spacing:1.1px;color:var(--teal);text-transform:uppercase}
+  h1{font-size:25px;color:var(--navy);margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px}
+  h2{font-size:20px;color:var(--navy);margin:0 0 10px}
+  .bar{display:flex;gap:5px;margin:14px 0 18px;flex-wrap:wrap}
+  .step{flex:1;min-width:70px;padding:6px 4px;border-radius:6px;background:var(--tint);border:1px solid var(--line);font-size:10.5px;font-weight:700;color:var(--muted);text-align:center}
+  .step.on{background:var(--navy);color:#fff;border-color:var(--navy)} .step.done{background:var(--tint2);color:var(--teal)}
+  .pick{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .case{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:9px;padding:15px 16px;background:var(--panel)}
+  .case:hover{border-color:var(--teal)}
+  .case .t{font-weight:700;color:var(--navy);font-size:16px;margin-bottom:4px}
+  .case .d{font-size:13.5px;color:var(--muted)}
+  table.subj{width:100%;border-collapse:separate;border-spacing:0 5px;margin-bottom:14px}
+  table.subj td{padding:8px 12px;background:var(--tint);font-size:14px;vertical-align:top}
+  table.subj td:first-child{width:28%;font-weight:700;color:var(--navy);border-radius:6px 0 0 6px}
+  table.subj td:last-child{border-radius:0 6px 6px 0}
+  table.subj tr.flag td{background:var(--rbg)}
+  .note{font-size:13px;color:var(--teal);font-weight:700;margin:4px 0 10px}
+  .task{background:var(--navy);color:#fff;border-radius:8px;padding:14px 16px;margin:0 0 12px}
+  .task p{margin:0;font-size:16px;font-weight:600} .task .small{font-weight:400;font-size:13px;opacity:.85;margin-top:6px}
+  .meta{font-size:13px;color:var(--muted);margin:0 0 10px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font:inherit;color:inherit;font-weight:600}
+  .opt:hover{border-color:var(--teal)} .opt[aria-pressed="true"]{border:2px solid var(--navy);background:var(--tint)}
+  .opt[disabled]{cursor:default;opacity:.55} .opt.chosen[disabled]{opacity:1}
+  .fb{border-radius:7px;padding:11px 13px;margin-bottom:8px;font-size:14px}
+  .fb.g{background:var(--gbg)} .fb.y{background:var(--ybg)} .fb.r{background:var(--rbg)} .fb.n{background:var(--tint)}
+  .fb b.t{display:block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px}
+  .fb.g b.t{color:var(--g)} .fb.y b.t{color:var(--y)} .fb.r b.t{color:var(--r)} .fb.n b.t{color:var(--teal)}
+  .fb .res{display:block;margin:4px 0;padding:7px 9px;background:var(--panel);border-radius:5px;font-size:13.5px}
+  .fb .why{display:block;font-size:13.5px;margin-top:4px}
+  .act{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  button.go{background:var(--navy);color:#fff;border:0;border-radius:7px;padding:11px 20px;font:inherit;font-weight:600;cursor:pointer}
+  button.go[disabled]{background:var(--muted);cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--teal);border:1px solid var(--line)}
+  .tally{display:flex;gap:10px;margin-bottom:14px}
+  .tally div{flex:1;border-radius:8px;padding:10px;text-align:center;font-size:13px;font-weight:700}
+  .tally .g{background:var(--gbg);color:var(--g)} .tally .y{background:var(--ybg);color:var(--y)} .tally .r{background:var(--rbg);color:var(--r)}
+  .tally span{display:block;font-size:24px}
+  .sumsec h3{font-size:14px;color:var(--navy);margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .disc{background:var(--navy);color:#fff;border-radius:8px;padding:15px 17px;margin:18px 0}
+  .disc h3{margin:0 0 8px;font-size:12px;letter-spacing:.9px;text-transform:uppercase;color:#7FC4D6}
+  .disc ul{margin:0;padding-left:18px} .disc li{margin-bottom:6px;font-size:14px}
+  footer{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  @media(max-width:640px){.pick{grid-template-columns:1fr} table.subj td:first-child{width:36%} h1{font-size:21px}}
+  @media print{.act,.bar,footer{display:none} details{display:block} details>div{display:block}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kick">DPHT 7441 &nbsp;|&nbsp; Module 5 &nbsp;|&nbsp; Practice Cases</div>
+  <h1 id="h1">Practice Cases, Start to Finish</h1>
+  <div class="sub" id="hsub">Four new patients. Each opens with the subjective examination already done, like Ray's. Then you work every component in order, with feedback after each step.</div>
+</header>
+<div class="bar" id="bar"></div>
+<main id="stage" aria-live="polite"></main>
+<footer>Nothing is saved, submitted, or graded. This is practice for you.</footer>
+</div>
+
+<script>
+const SCREEN = (g, why) => ({ key:"screen", lab:"Screen", task:"Before anything else: can you treat this patient?", hint:"Read the screening row first. Decide before you examine.", pick:1, items:[
+  { t: g==="treat"?"g":"r", lab:"Treat now",
+    why: g==="treat" ? why.treat : why.treat },
+  { t:"r", lab:"Treat, but send for imaging first", why: why.imaging },
+  { t:"r", lab:"Refer to a physician before any treatment", why: why.physician },
+  { t: g==="emergency"?"g":"r", lab:"Emergency referral today", why: why.emergency }
+]});
+
+const CASES = [
+{
+  id:"marcus", name:"Case 1 — Marcus, 29", blurb:"Six days of right-sided low back pain after lifting at work.",
+  subj:[
+    ["Age / Sex","29  |  Male"],
+    ["Occupation","Line cook. Ten-hour shifts on his feet, lifting stock from the floor to the shelves. He has left two shifts early this week."],
+    ["Duration","6 days. Sharp onset bending to lift a box of produce."],
+    ["Location","Right low back, just beside the midline, with an ache into the right buttock. Nothing below the buttock."],
+    ["Aggravating","Bending forward, getting out of bed, turning over in bed, getting out of his car."],
+    ["Easing","Moving around once he is warmed up, heat, lying still."],
+    ["Neurological symptoms","None. No numbness, tingling or weakness."],
+    ["Prior episodes","None."],
+    ["Screening","No bowel or bladder change, no saddle numbness, no weight loss, no fever, no cancer history, no significant trauma."],
+    ["Baseline measures","Oswestry 30%. Pain 5 of 10 at worst. Fear-Avoidance Beliefs work subscale 11."]
+  ],
+  stages:[
+    SCREEN("treat",{
+      treat:"Correct. The screen is clear and the pain behaves mechanically — it changes with movement and position. Nothing here needs another clinician before you start.",
+      imaging:"Not indicated. There are no red flags, and imaging at six days would not change what you do.",
+      physician:"Nothing in the screen calls for a physician first. A mechanical, six-day history with a clear screen is exactly the patient a physical therapist sees directly.",
+      emergency:"No. There is no saddle numbness, no bladder or bowel change, and no progressive weakness." }),
+    { key:"predict", lab:"Predict", task:"From the history alone, which treatment-based classification subgroup will he land in?", hint:"Commit before you examine. The examination tests your prediction.", pick:1, items:[
+      { t:"g", lab:"Manipulation", why:"The history already meets several manipulation criteria: fewer than 16 days, and nothing below the knee. His fear-avoidance work score of 11 is already under 19. The examination has to confirm the other two: a hypomobile segment and hip internal rotation." },
+      { t:"r", lab:"Specific exercise", why:"There are no referred symptoms to centralize — his pain stops at the buttock and does not travel. A directional preference is unlikely to be the defining finding." },
+      { t:"r", lab:"Stabilization", why:"This is his first episode and there is nothing suggesting instability. Stabilization is built on recurrence and aberrant movement." },
+      { t:"r", lab:"Traction", why:"Traction needs nerve root signs, symptoms below the knee, and peripheralization. He has none of the three." } ]},
+    { key:"exam", lab:"Examine", task:"Choose FOUR tests to perform.", hint:"For each, know what a positive and a negative would do before you choose it.", pick:4, exam:true, items:[
+      { t:"g", lab:"Lumbar active range of motion with overpressure", res:"Flexion limited about 50% and reproduces his right-sided back pain. Right side bending limited and painful. Extension mildly limited.",
+        why:"Cheap and informative. It shows which movements provoke him and frames the segmental testing that follows." },
+      { t:"g", lab:"Posterior-to-anterior segmental mobility testing, L3 to S1", res:"L4–5 is hypomobile on the right and reproduces his familiar pain. The other levels are unremarkable.",
+        why:"A hypomobile lumbar segment is one of the five manipulation criteria. This is the test that finds it." },
+      { t:"g", lab:"Hip internal rotation, both sides", res:"40 degrees on the right, 38 degrees on the left.",
+        why:"At least one hip with more than 35 degrees of internal rotation is a manipulation criterion. Both of his qualify." },
+      { t:"g", lab:"Lower quarter neurological screen", res:"Normal. Myotomes, dermatomes, and the patellar, medial hamstring and Achilles reflexes are all symmetric.",
+        why:"Documents a clean baseline and closes any nerve root question. Quick, and worth doing on every patient with back pain." },
+      { t:"y", lab:"Repeated movements in flexion and extension", res:"No lasting change in either direction. He has no referred symptoms to centralize or peripheralize.",
+        why:"Reasonable to check, and it rules out specific exercise. With pain that never travels, it was unlikely to be the deciding test." },
+      { t:"y", lab:"Sacroiliac provocation cluster — four tests", res:"None of the four reproduces his pain.",
+        why:"Right-sided pain beside the midline keeps the SIJ in view, so it is defensible. It costs four tests, and his history points more at the lumbar spine." },
+      { t:"r", lab:"Crossed straight leg raise", res:"Negative.",
+        why:"A test for a large central disc in a patient with nothing below the buttock. It had nothing to find." },
+      { t:"r", lab:"FABER", res:"Negative.",
+        why:"Nothing in his history points to the hip or a groin ache. Not the right place to spend a test." } ]},
+    { key:"classify", lab:"Classify", task:"Now classify him. Which category and subgroup does the examination support?", hint:"Name the finding that decides it.", pick:1, items:[
+      { t:"g", lab:"Acute low back pain with mobility deficits — manipulation subgroup", why:"He meets all five manipulation criteria: fewer than 16 days, nothing distal to the knee, a hypomobile L4–5, hip internal rotation over 35 degrees, and a fear-avoidance work score of 11, under the rule’s cut point of 19. He also meets the two-factor rule on duration and symptom location." },
+      { t:"r", lab:"Acute low back pain with related lower extremity pain — specific exercise", why:"Nothing centralized, because nothing travels. Specific exercise needs a demonstrated directional response." },
+      { t:"r", lab:"Acute low back pain with movement coordination impairments — stabilization", why:"First episode, normal movement quality, no instability findings." },
+      { t:"r", lab:"Acute low back pain with radiating pain — traction", why:"No nerve root signs, nothing below the knee, and no peripheralization." } ]},
+    { key:"icf", lab:"Diagnose", task:"Which is the strongest PT diagnosis to write in the note?", hint:"Three ICF levels, and every line re-measurable.", pick:1, items:[
+      { t:"g", lab:"Right L4–5 hypomobility reproducing his pain, flexion limited 50%, pain 5 of 10; cannot bend to lift stock or get out of bed without pain, Oswestry 30%; leaving shifts early.", why:"All three levels — body structure and function, activity, participation — and every line carries something you can re-measure." },
+      { t:"y", lab:"Low back pain with limited motion, affecting his work.", why:"The right shape and no numbers. Nobody could re-measure this in two weeks." },
+      { t:"r", lab:"Acute lumbar strain.", why:"A pathology label. It says nothing about what he cannot do or what would count as improvement." },
+      { t:"r", lab:"L4–5 facet dysfunction requiring manipulation.", why:"A structural claim plus a treatment. Neither belongs in the diagnosis, and the structure is not something you confirmed." } ]},
+    { key:"plan", lab:"Plan", task:"Choose THREE interventions for his plan of care.", hint:"Matched to the classification, not to habit.", pick:3, items:[
+      { t:"g", lab:"Thrust manipulation to the lumbopelvic region", why:"Matched to his subgroup. The 2021 decision tree lists thrust or non-thrust mobilization for acute LBP with mobility deficits with strong evidence, and he meets all five criteria of the rule." },
+      { t:"g", lab:"Active range of motion exercise after manipulation", why:"The recording pairs manipulation with active range of motion afterward, and the decision tree matches general exercise to improve thorax, low back and hip mobility." },
+      { t:"g", lab:"Education on the favorable natural history, and advice to stay active", why:"Matched with moderate evidence. It is also the thing that keeps a first episode from becoming a recurring one." },
+      { t:"y", lab:"Non-thrust mobilization", why:"Also matched, and the right choice if he declines thrust. It ranks below thrust only because thrust is what his rule identifies." },
+      { t:"y", lab:"Soft tissue mobilization", why:"Matched as an adjunct for short-term relief. Reasonable, and not the core of his plan." },
+      { t:"r", lab:"Bed rest for two to three days", why:"Not advised. The 2012 CPG warns against education that promotes extended bed rest." },
+      { t:"r", lab:"Mechanical traction", why:"Not matched — he is not the traction subgroup." },
+      { t:"r", lab:"A trunk stabilization program as the primary treatment", why:"Not his subgroup. Nothing points to a movement coordination problem." } ]},
+    { key:"outcome", lab:"Measure", task:"Choose ONE outcome measure to track his progress.", hint:"", pick:1, items:[
+      { t:"g", lab:"Oswestry Disability Index", why:"The condition-specific disability measure for low back pain, with a baseline already recorded at 30%." },
+      { t:"y", lab:"Numeric Pain Rating Scale", why:"Fast and useful, but it says nothing about function." },
+      { t:"y", lab:"Patient-Specific Functional Scale", why:"Captures his own tasks, like lifting stock. Reasonable alongside the Oswestry." },
+      { t:"r", lab:"Pelvic Girdle Questionnaire", why:"Built for pelvic girdle pain. Wrong population." },
+      { t:"r", lab:"Lower Extremity Functional Scale", why:"A lower extremity measure for a patient whose symptoms stop at the buttock." } ]}
+  ],
+  discuss:[["Which of the five manipulation criteria could you only confirm by examining him?","Two: the hypomobile lumbar segment, found with spring testing, and hip internal rotation over 35 degrees. Duration, symptom location and fear-avoidance all came from the history."],["Why is bed rest a red choice even though it would feel kind to offer it?","The 2012 CPG warns against education that promotes extended bed rest. Rest tells him his back is fragile and delays the activity that helps a first episode settle."],["If his pain had spread below the knee by the next visit, what would change?","He would no longer meet the manipulation criteria — symptoms distal to the knee fail both the rule and the two-factor rule. Re-screen him neurologically and re-test repeated movements, since he may now centralize or peripheralize."]]
+},
+{
+  id:"elena", name:"Case 2 — Elena, 41", blurb:"Three weeks of left low back and thigh pain, worse on her feet.",
+  subj:[
+    ["Age / Sex","41  |  Female"],
+    ["Occupation","Retail store manager. On her feet for most of a shift. She has been leaving work early most days this week."],
+    ["Duration","3 weeks. Came on gradually after a weekend of painting a ceiling."],
+    ["Location","Left low back into the left buttock and the back of the left thigh, stopping above the knee."],
+    ["Aggravating","Standing longer than 30 minutes, walking the store floor, lying on her stomach, reaching overhead."],
+    ["Easing","Sitting, bending forward, lying on her back with her knees pulled toward her chest."],
+    ["Neurological symptoms","None. No numbness, tingling or weakness."],
+    ["Prior episodes","One, three years ago. Similar, resolved in about a month."],
+    ["Screening","No bowel or bladder change, no saddle numbness, no weight loss, no fever, no cancer history, no trauma."],
+    ["Baseline measures","Oswestry 26%. Pain 6 of 10 at worst."]
+  ],
+  stages:[
+    SCREEN("treat",{
+      treat:"Correct. The screen is clear, and thigh pain above the knee with no neurological symptoms is not, on its own, a reason to wait.",
+      imaging:"Not indicated. No red flags, and imaging would not change what you do.",
+      physician:"Nothing here calls for a physician first. Referred thigh pain with a clean screen is within direct physical therapy care.",
+      emergency:"No. There is no saddle numbness, no bladder or bowel change, and no weakness." }),
+    { key:"predict", lab:"Predict", task:"From the history alone, which treatment-based classification subgroup will she land in?", hint:"Commit before you examine.", pick:1, items:[
+      { t:"g", lab:"Specific exercise", why:"She has referred symptoms that could centralize, and a clear directional pattern: standing, walking and extension provoke her; sitting and flexion ease her. The examination has to demonstrate it." },
+      { t:"y", lab:"Manipulation", why:"Her symptoms stop above the knee and fear-avoidance may be low — but at three weeks she is past the 16-day duration criterion, and she fails the two-factor rule on it." },
+      { t:"r", lab:"Stabilization", why:"She is over 40 and this is only her second episode. Nothing in the history suggests instability." },
+      { t:"r", lab:"Traction", why:"No nerve root signs and nothing below the knee." } ]},
+    { key:"exam", lab:"Examine", task:"Choose FOUR tests to perform.", hint:"Test the directional pattern you predicted.", pick:4, exam:true, items:[
+      { t:"g", lab:"Repeated movements: flexion in lying and extension in standing", res:"Repeated extension in standing sends the pain further down her thigh, and it stays there. Repeated flexion in lying abolishes the thigh pain and it stays gone — only a central back ache remains.",
+        why:"The deciding test. Symptoms retreating toward the spine and staying there is centralization, and it happened with FLEXION." },
+      { t:"g", lab:"Lumbar active range of motion with overpressure", res:"Extension limited about 50% and reproduces her thigh pain. Flexion full, and it eases the pain.",
+        why:"Shows the directional asymmetry that makes repeated movements the obvious next step." },
+      { t:"g", lab:"Lower quarter neurological screen", res:"Normal. Myotomes, dermatomes and reflexes symmetric.",
+        why:"Thigh pain makes this essential. A normal screen tells you her leg pain is referred, not radicular." },
+      { t:"g", lab:"Straight leg raise with structural differentiation", res:"Negative to 80 degrees. Posterior thigh tightness only, unchanged by ankle dorsiflexion.",
+        why:"The straight leg raise is sensitive for disc herniation, so a negative makes a nerve root problem unlikely — exactly what referred thigh pain needs." },
+      { t:"y", lab:"Sacroiliac provocation cluster — four tests", res:"None of the four reproduces her pain.",
+        why:"Left buttock and posterior thigh pain keeps the SIJ in view, so it is defensible. It costs four tests, and her pain behaves directionally rather than with load transfer." },
+      { t:"y", lab:"Prone instability test", res:"Negative.",
+        why:"Rules out stabilization. Reasonable, and she was unlikely to be that subgroup." },
+      { t:"r", lab:"Crossed straight leg raise", res:"Negative.",
+        why:"A specific test for a large central disc in a patient with no nerve root picture." },
+      { t:"r", lab:"FABER", res:"Negative.",
+        why:"Nothing points to the hip. Not the place to spend a test." } ]},
+    { key:"classify", lab:"Classify", task:"Now classify her. Which category and subgroup does the examination support?", hint:"Watch the direction.", pick:1, items:[
+      { t:"g", lab:"Acute low back pain with related (referred) lower extremity pain — specific exercise, directional preference for FLEXION", why:"Her thigh pain centralized with repeated flexion and stayed centralized. That is the defining finding. The direction is flexion — the subgroup is defined by whichever direction centralizes, not by extension." },
+      { t:"r", lab:"Specific exercise, directional preference for EXTENSION", why:"Extension PERIPHERALIZED her. This is the most common error in the case: assuming the direction is extension because that is the usual example." },
+      { t:"r", lab:"Acute low back pain with radiating pain — traction", why:"Her neurological screen and straight leg raise are negative. Her leg pain is referred, not radicular." },
+      { t:"r", lab:"Acute low back pain with mobility deficits — manipulation", why:"She fails the duration criterion, and she has a demonstrated directional preference, which classifies her more specifically." } ]},
+    { key:"icf", lab:"Diagnose", task:"Which is the strongest PT diagnosis to write in the note?", hint:"", pick:1, items:[
+      { t:"g", lab:"Left low back pain referring to the posterior thigh, centralizing with flexion; extension limited 50% and reproducing thigh pain; pain 6 of 10; neurological screen normal. Cannot stand beyond 30 minutes, Oswestry 26%. Leaving work early most days.", why:"All three ICF levels, each re-measurable, and it records the neurological screen that makes the leg pain referred rather than radicular." },
+      { t:"r", lab:"Left L5 radiculopathy with a directional preference for flexion; standing tolerance 30 minutes; Oswestry 26%.", why:"Radiculopathy requires nerve root involvement. Her screen and straight leg raise are negative, so her thigh pain is referred. This is the trap in the case." },
+      { t:"y", lab:"Back and thigh pain that limits standing and work.", why:"The right shape and no numbers." },
+      { t:"r", lab:"Lumbar facet syndrome.", why:"A pathology label you did not confirm, and it tells the next clinician nothing about her function." } ]},
+    { key:"plan", lab:"Plan", task:"Choose THREE interventions for her plan of care.", hint:"", pick:3, items:[
+      { t:"g", lab:"Repeated flexion exercise in the direction that centralized her", why:"The decision tree matches Mechanical Diagnosis and Therapy interventions — repeated movements that promote centralization — to acute LBP with referred lower extremity pain, and directional exercise carries a Grade A recommendation." },
+      { t:"g", lab:"Postures and positions that reduce sustained extension at work", why:"Part of the same matched approach: positions that keep her in the centralizing direction. Her job puts her on her feet, which is her aggravating position." },
+      { t:"g", lab:"Progress to trunk activation and movement control once centralization holds", why:"The decision tree says to progress to movement coordination strategies. The timing matters — after the directional response is stable, not before." },
+      { t:"y", lab:"Education on the favorable natural history", why:"Sound, and part of good care for any acute episode. Not the matched intervention that defines her plan." },
+      { t:"y", lab:"Non-thrust mobilization to promote centralization", why:"The matched approach includes manual therapy that promotes centralization. Reasonable as an adjunct." },
+      { t:"r", lab:"Prone press-ups", why:"Extension is the direction that peripheralized her. This undoes the plan." },
+      { t:"r", lab:"Thrust manipulation", why:"She fails the two-factor rule on duration, and her classification is directional." },
+      { t:"r", lab:"Mechanical traction", why:"Not her subgroup." } ]},
+    { key:"outcome", lab:"Measure", task:"Choose ONE outcome measure to track her progress.", hint:"", pick:1, items:[
+      { t:"g", lab:"Oswestry Disability Index", why:"The condition-specific disability measure, with a baseline of 26%." },
+      { t:"y", lab:"Numeric Pain Rating Scale", why:"Fast, and says nothing about function." },
+      { t:"y", lab:"Patient-Specific Functional Scale", why:"Would capture standing and walking the store floor in her own terms. Reasonable alongside the Oswestry." },
+      { t:"r", lab:"Pelvic Girdle Questionnaire", why:"Wrong population." },
+      { t:"r", lab:"Lower Extremity Functional Scale", why:"A lower extremity measure for referred pain from the lumbar spine." } ]}
+  ],
+  discuss:[["Why is her thigh pain referred rather than radicular, and which two findings prove it?","Her normal neurological screen and her negative straight leg raise. Radicular pain comes from nerve root involvement; she shows none, so her thigh pain is referred."],["What would have happened if you had given her the extension exercises that helped Ray?","She would have gotten worse. Extension peripheralized her — her thigh pain spread further and stayed. The direction comes from her own test, not from the last patient you saw."],["Stenosis also improves with flexion. What about Elena makes it unlikely?","Her age, her onset, and her side. At 41, three weeks after a specific activity, with pain on one side only, she does not fit the older, gradually progressive, bilateral and walking-limited picture of stenosis."]]
+},
+{
+  id:"dana", name:"Case 3 — Dana, 47", blurb:"Seven months of widespread back pain, and she has stopped doing things.",
+  subj:[
+    ["Age / Sex","47  |  Female"],
+    ["Occupation","Office administrator. Currently working reduced hours."],
+    ["Duration","7 months. Gradual, no injury. Several flares over the past two years."],
+    ["Location","Widespread low back pain on both sides, spreading at times into both buttocks and the upper back. Changes from day to day."],
+    ["Aggravating","“Almost everything.” Bending, lifting groceries, sitting through a long meeting. She has stopped lifting anything and stopped exercising “because I don’t want to damage it any further.”"],
+    ["Easing","Rest, lying down, heat and medication — briefly."],
+    ["Neurological symptoms","Occasional vague tingling in both legs that does not follow any pattern. No weakness."],
+    ["Prior episodes","Several flares over two years."],
+    ["Screening","No bowel or bladder change, no saddle numbness, no weight loss, no fever, no cancer history, no trauma."],
+    ["Baseline measures","Oswestry 48%. Pain 7 of 10 at worst."]
+  ],
+  stages:[
+    SCREEN("treat",{
+      treat:"Correct, with one thing worth pausing on. Dutton lists bilateral root pain among the signs of a central disc, canal narrowing or malignancy — but hers is vague tingling in no dermatomal pattern, with no weakness and a clear screen. Seven months of pain is not itself a red flag. Keep one thing in view: the decision tree raises suspicion of a tumor if pain fails to improve within 30 days.",
+      imaging:"Not indicated, and potentially harmful here. She is already afraid of damage; a scan that shows ordinary age-related changes can deepen that fear without changing her care.",
+      physician:"Nothing in the screen calls for a physician first.",
+      emergency:"No. The bilateral tingling is vague and patternless, with no saddle numbness, no bladder or bowel change, and no weakness." }),
+    { key:"predict", lab:"Predict", task:"From the history alone, which category does she fit best?", hint:"Chronic pain changes the list of options.", pick:1, items:[
+      { t:"g", lab:"Chronic low back pain with related generalized pain", why:"More than three months, widespread and variable pain that does not fit a single mechanical pattern, and clear fear-avoidance in her own words. The examination and questionnaires have to confirm it." },
+      { t:"y", lab:"Chronic low back pain with movement coordination impairments", why:"Recurrent flares keep it in view, but her history is dominated by generalized pain and fear rather than a movement problem." },
+      { t:"r", lab:"Acute low back pain with mobility deficits — manipulation", why:"She is seven months in, and her fear-avoidance is plainly high." },
+      { t:"r", lab:"Chronic low back pain with radiating pain", why:"Her tingling is bilateral and patternless, with no weakness — not a nerve root picture." } ]},
+    { key:"exam", lab:"Examine", task:"Choose FOUR tests or measures.", hint:"Questionnaires count. So does watching how she moves.", pick:4, exam:true, items:[
+      { t:"g", lab:"STarT Back Screening Tool", res:"Overall score 7 of 9. Psychosocial subscale 4 of 5 — high risk.",
+        why:"A psychosocial subscale score of 4 or more places her in the high-risk group. The decision tree uses this tool for risk stratification, and a high psychosocial score is a rule-in finding." },
+      { t:"g", lab:"Fear-Avoidance Beliefs Questionnaire", res:"Work subscale 31 of 42. Physical activity subscale 20 of 24.",
+        why:"High fear-avoidance is one of the CPG’s criteria for this category. Her work score is well above the 19 used in the manipulation rule." },
+      { t:"g", lab:"Lumbar active range of motion, watching how she moves", res:"Flexion limited to mid-thigh with bracing and slow, guarded movement. Pain reported through every direction.",
+        why:"The movement behavior matters as much as the range. Guarding and bracing are consistent with fear of movement." },
+      { t:"g", lab:"Lower quarter neurological screen", res:"Normal. The tingling does not follow any dermatome and does not change with testing.",
+        why:"Her leg tingling has to be explained. A normal screen and a patternless distribution rule out a nerve root problem." },
+      { t:"y", lab:"Repeated movements in flexion and extension", res:"No change in either direction — no directional preference.",
+        why:"Reasonable, and it removes specific exercise. It was unlikely to be the answer in widespread, variable pain." },
+      { t:"y", lab:"Straight leg raise", res:"Both legs to about 60 degrees, limited by back pain and apprehension rather than leg symptoms.",
+        why:"Defensible given the tingling. The apprehension it shows is as informative as the range." },
+      { t:"r", lab:"Posterior-to-anterior pressure at every lumbar level", res:"Pain reported at every level from L1 to S1.",
+        why:"Widespread tenderness localizes nothing, and repeated provocation can reinforce the idea that her back is damaged." },
+      { t:"r", lab:"Crossed straight leg raise", res:"Negative.",
+        why:"A test for a large central disc. Nothing in her presentation suggests one." } ]},
+    { key:"classify", lab:"Classify", task:"Now classify her.", hint:"Duration decides between two of these.", pick:1, items:[
+      { t:"g", lab:"Chronic low back pain with related generalized pain", why:"The 2012 CPG criteria fit exactly: pain for more than three months, generalized pain not consistent with the other classifications, and high fear-avoidance scores with behavior to match." },
+      { t:"y", lab:"Acute low back pain with related cognitive or affective tendencies", why:"The right idea — her fear-avoidance is the central finding — but that category is for acute and subacute pain. At seven months, she is chronic." },
+      { t:"r", lab:"Chronic low back pain with movement coordination impairments", why:"Nothing on examination showed a movement coordination problem; her movement was guarded, not aberrant." },
+      { t:"r", lab:"Acute low back pain with mobility deficits — manipulation", why:"Wrong duration, and her fear-avoidance is far above the rule’s threshold." } ]},
+    { key:"icf", lab:"Diagnose", task:"Which is the strongest PT diagnosis to write in the note?", hint:"", pick:1, items:[
+      { t:"g", lab:"Widespread low back pain 7 of 10 with elevated fear-avoidance (FABQ work 31) and a high-risk STarT Back psychosocial score; guarded, limited flexion; neurological screen normal. Avoids lifting and bending, Oswestry 48%. Working reduced hours and has stopped exercising.", why:"All three levels and every line measurable. It also records the fear-avoidance score as a body function finding, which is where the CPGs place it." },
+      { t:"r", lab:"Chronic lumbar degenerative disc disease.", why:"A pathoanatomical label — and the 2012 CPG specifically warns against in-depth pathoanatomical explanations, because they increase perceived threat." },
+      { t:"y", lab:"Chronic pain that limits her daily life.", why:"True, and nothing in it can be re-measured." },
+      { t:"r", lab:"Central sensitization.", why:"A mechanism label, not a diagnosis you can measure or re-test." } ]},
+    { key:"plan", lab:"Plan", task:"Choose THREE interventions for her plan of care.", hint:"", pick:3, items:[
+      { t:"g", lab:"Pain neuroscience education", why:"Matched with strong evidence in the 2021 decision tree for chronic LBP with generalized pain, to lessen fear-avoidance and catastrophizing." },
+      { t:"g", lab:"General and aerobic exercise, graded to her tolerance", why:"Matched with strong evidence. Graded exposure also directly challenges the belief that activity will damage her back." },
+      { t:"g", lab:"Active education and advice to return to an active lifestyle", why:"Matched with moderate evidence, and it addresses the activities she has stopped." },
+      { t:"y", lab:"Cognitive functional therapy", why:"Also matched, with moderate evidence. It targets the same contributors and generally requires specific training to deliver." },
+      { t:"y", lab:"Soft tissue mobilization for short-term relief", why:"May help briefly, but passive care can reinforce the belief that her back needs fixing by someone else." },
+      { t:"r", lab:"A detailed explanation of her disc degeneration on imaging", why:"The 2012 CPG warns against in-depth pathoanatomical explanations because they increase the perceived threat." },
+      { t:"r", lab:"Advice to rest until the pain settles", why:"The CPG warns against education that promotes rest. For a patient already avoiding activity out of fear, this confirms the fear." },
+      { t:"r", lab:"Thrust manipulation as the primary treatment", why:"Not matched to her classification, and it keeps the focus on a structural fix." } ]},
+    { key:"outcome", lab:"Measure", task:"Choose ONE outcome measure to track her progress.", hint:"", pick:1, items:[
+      { t:"g", lab:"Oswestry Disability Index", why:"Tracks disability, which is what she needs to change. Repeat the FABQ alongside it — falling fear-avoidance is part of how you will know the plan is working." },
+      { t:"y", lab:"Fear-Avoidance Beliefs Questionnaire", why:"Worth repeating, and it measures the thing you are treating. As the single primary measure it misses her function." },
+      { t:"y", lab:"Numeric Pain Rating Scale", why:"Pain may be slow to change even as she improves. Tracking it alone can make progress look like failure." },
+      { t:"r", lab:"Pelvic Girdle Questionnaire", why:"Wrong population." },
+      { t:"r", lab:"Lower Extremity Functional Scale", why:"Her problem is not in the lower extremity." } ]}
+  ],
+  discuss:[["Where does her fear-avoidance score belong in the ICF diagnosis, and why?","Body structure and function. The CPGs classify the FABQ as measuring an impairment of body function — fear-avoidance thoughts and behaviors — not a participation restriction."],["Why is imaging a red choice at the very first decision?","There are no red flags, so imaging would not change her care. And for a patient already afraid of damage, a report of ordinary age-related findings can raise the threat she feels — the 2012 CPG cautions against explanations that do that."],["What would you say to her about the tingling in her legs?","That you tested it and her nerves are working normally: the neurological screen was normal and the tingling does not follow any nerve’s path. Say it plainly, without structural language, because she is already worried about damage."]]
+},
+{
+  id:"tom", name:"Case 4 — Tom, 52", blurb:"Ten days of back pain, and something has changed since yesterday.",
+  subj:[
+    ["Age / Sex","52  |  Male"],
+    ["Occupation","Electrician."],
+    ["Duration","10 days of low back pain. Pain into both legs for the past 3 days."],
+    ["Location","Central low back, both buttocks, and down the backs of both thighs and calves."],
+    ["Aggravating","Sitting, coughing, sneezing."],
+    ["Easing","Very little."],
+    ["Neurological symptoms","Since yesterday: numbness “around my backside and between my legs.” Both feet feel weak on stairs."],
+    ["Prior episodes","Occasional low back pain, never with leg symptoms."],
+    ["Screening","Saddle numbness since yesterday. Trouble starting to urinate this morning. No weight loss, no fever, no cancer history, no trauma."],
+    ["Baseline measures","Pain 8 of 10. Others not yet collected."]
+  ],
+  stages:[
+    SCREEN("emergency",{
+      treat:"No. Saddle numbness and new difficulty starting urination are the defining features of cauda equina syndrome, which Dutton describes as a medical emergency.",
+      imaging:"No. Arranging outpatient imaging delays emergency evaluation of a time-sensitive condition.",
+      physician:"Not enough. A routine physician appointment is too slow. This needs same-day emergency evaluation.",
+      emergency:"Correct. Saddle numbness, new urinary difficulty, bilateral leg pain and weakness together are cauda equina syndrome until proven otherwise. The subjective examination recording lists this as an emergency referral, and the decision tree directs a suspected medical or surgical condition to the appropriate medical practitioner. The case ends here, and that is the right outcome." }),
+    { key:"why", lab:"Findings", task:"Which TWO findings drive that decision most?", hint:"Several are serious. Two define it.", pick:2, items:[
+      { t:"g", lab:"Saddle numbness", why:"Sensory loss in a saddle distribution is one of the defining features of cauda equina syndrome." },
+      { t:"g", lab:"New difficulty starting urination", why:"Bladder dysfunction — Dutton describes urinary retention with overflow incontinence — is the other defining feature, and together with saddle numbness it is what makes this an emergency." },
+      { t:"y", lab:"Pain in both legs", why:"Bilateral sciatica is part of the picture Dutton describes, and it raises concern. On its own it is not what makes this an emergency." },
+      { t:"y", lab:"New weakness in both feet", why:"Serious, and rapidly progressive or bilateral weakness is itself a do-not-miss finding. The saddle and bladder changes are what define cauda equina." },
+      { t:"r", lab:"Pain worse with coughing and sneezing", why:"Dejerine’s triad points toward a disc-related problem. Relevant to the cause, not to the urgency." },
+      { t:"r", lab:"Ten days of back pain", why:"Duration is not a red flag here. What changed yesterday is." } ]},
+    { key:"act", lab:"Act", task:"Choose THREE things you do before he leaves your clinic.", hint:"The referral is the treatment.", pick:3, items:[
+      { t:"g", lab:"Send him to the emergency department today, and tell him plainly why", why:"Same-day emergency evaluation, with a clear explanation so he understands the urgency and goes." },
+      { t:"g", lab:"Document the neurological and bladder findings, with the time you found them", why:"The timing of onset matters to the receiving clinicians, and your documentation is the record of it." },
+      { t:"g", lab:"Contact the emergency department or his physician directly", why:"Do not rely on him to relay a time-sensitive finding. Direct communication is part of the referral." },
+      { t:"r", lab:"Complete your full examination first so the referral is thorough", why:"Every minute spent examining is a minute before emergency evaluation. The history already told you what you need." },
+      { t:"r", lab:"Give him home exercises and see him in two days", why:"Treating as mechanical back pain misses an emergency." },
+      { t:"r", lab:"Mechanical traction to take pressure off the nerve roots", why:"Not appropriate. This is not a physical therapy problem today." },
+      { t:"r", lab:"Tell him to go to the emergency department if it gets worse", why:"It is already an emergency — Dutton describes cauda equina syndrome as a medical emergency. Waiting for it to worsen only delays the care it needs." } ]},
+    { key:"classify", lab:"Classify", task:"Where does he sit in the CPG decision tree?", hint:"", pick:1, items:[
+      { t:"g", lab:"Medical or surgical condition — refer to the appropriate practitioner", why:"The 2021 decision tree: if a medical or surgical condition is suspected, refer. No LBP subgroup applies." },
+      { t:"r", lab:"Acute low back pain with radiating pain — traction", why:"The leg pain is radiating, but the saddle and bladder findings take him out of physical therapy classification entirely." },
+      { t:"r", lab:"Acute low back pain with mobility deficits — manipulation", why:"Dangerous. The manual therapy recording lists cauda equina syndrome among the conditions to rule out before any thrust." },
+      { t:"r", lab:"Chronic low back pain with generalized pain", why:"Wrong on duration and wrong on everything else." } ]}
+  ],
+  discuss:[["Which single question in the subjective examination would have found this if Tom had not volunteered it?","Asking directly about bladder and bowel function and saddle sensation. It belongs in every low back screen for exactly this reason."],["What would you have done if he had reported only the leg weakness, without the saddle or bladder changes?","Still not treated it as routine. The subjective examination recording lists rapidly progressive or bilateral leg weakness as a do-not-miss finding: with a progressing neurological deficit, refer before you load."],["Why does this case end after the first decision, and why is that the correct outcome?","Because the management belongs to someone else. Recognizing cauda equina syndrome and referring the same day is the physical therapy intervention."]]
+}
+];
+
+const shuffle=a=>{const o=a.slice();for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]];}return o;};
+let C=null, si=-1, picks={}, done={};
+const stage=document.getElementById('stage'), bar=document.getElementById('bar');
+const H1=document.getElementById('h1'), HS=document.getElementById('hsub');
+const TIER={g:'Strong choice',y:'Acceptable',r:'Not advised'};
+
+function menu(){
+  C=null; bar.innerHTML=''; H1.textContent='Practice Cases, Start to Finish';
+  HS.textContent='Four new patients. Each opens with the subjective examination already done, like Ray’s. Then you work every component in order, with feedback after each step.';
+  stage.innerHTML='';
+  const g=document.createElement('div'); g.className='pick';
+  CASES.forEach(c=>{
+    const a=document.createElement('a'); a.className='case'; a.href='#';
+    a.innerHTML='<div class="t">'+c.name+'</div><div class="d">'+c.blurb+'</div>';
+    a.onclick=e=>{e.preventDefault(); start(c); window.scrollTo(0,0);};
+    g.appendChild(a);
+  });
+  stage.appendChild(g);
+}
+function start(c){
+  C=Object.assign({},c); C.stages=c.stages.map(s=>Object.assign({},s,{items:shuffle(s.items)}));
+  si=-1; picks={}; done={}; render();
+}
+function drawBar(){
+  bar.innerHTML='';
+  const labs=['Subjective'].concat(C.stages.map(s=>s.lab)).concat(['Summary']);
+  labs.forEach((l,k)=>{const d=document.createElement('div'); const idx=k-1;
+    d.className='step'+(idx===si?' on':(idx<si?' done':'')); d.textContent=l; bar.appendChild(d);});
+}
+function render(){
+  drawBar(); H1.textContent=C.name; stage.innerHTML='';
+  if(si===-1) return renderSubj();
+  if(si>=C.stages.length) return renderSummary();
+  renderStage();
+}
+function renderSubj(){
+  HS.textContent='Subjective examination — performed at the initial visit and given to you. Start at the first decision.';
+  const h=document.createElement('h2'); h.textContent='Subjective Examination: What You Were Given'; stage.appendChild(h);
+  const t=document.createElement('table'); t.className='subj';
+  C.subj.forEach(([k,v])=>{const tr=document.createElement('tr'); if(C.flag && k===C.flag) tr.className='flag';
+    tr.innerHTML='<td>'+k+'</td><td>'+v+'</td>'; t.appendChild(tr);});
+  stage.appendChild(t);
+  const n=document.createElement('p'); n.className='note'; n.textContent='Read every row, including the screening row, before you decide anything.'; stage.appendChild(n);
+  actions([['Begin the case',()=>{si=0;render();window.scrollTo(0,0);}]], true);
+}
+function renderStage(){
+  const S=C.stages[si]; HS.textContent='Step '+(si+1)+' of '+C.stages.length+'.';
+  const t=document.createElement('div'); t.className='task';
+  t.innerHTML='<p>'+S.task+'</p>'+(S.hint?'<p class="small">'+S.hint+'</p>':''); stage.appendChild(t);
+  const sel=picks[S.key]||[]; const locked=!!done[S.key];
+  const m=document.createElement('p'); m.className='meta'; stage.appendChild(m);
+  const wrap=document.createElement('div'); stage.appendChild(wrap);
+  S.items.forEach((it,i)=>{
+    const b=document.createElement('button'); b.className='opt'+(sel.includes(i)?' chosen':''); b.type='button'; b.textContent=it.lab;
+    b.setAttribute('aria-pressed', sel.includes(i)?'true':'false');
+    if(locked) b.disabled=true;
+    b.onclick=()=>{ const cur=picks[S.key]||[]; const at=cur.indexOf(i);
+      if(at>=0) cur.splice(at,1); else { if(S.pick===1) cur.length=0; if(cur.length>=S.pick) return; cur.push(i); }
+      picks[S.key]=cur; render(); };
+    wrap.appendChild(b);
+  });
+  m.textContent = locked ? 'Your choices are locked in. Read the feedback, then continue.' : (sel.length+' of '+S.pick+' selected');
+  if(!locked){
+    actions([['Confirm',()=>{done[S.key]=true;render();}]], sel.length===S.pick, true);
+  } else {
+    const fb=document.createElement('div'); fb.style.marginTop='14px';
+    sel.forEach(i=>{ const it=S.items[i]; const d=document.createElement('div'); d.className='fb '+it.t;
+      d.innerHTML='<b class="t">'+TIER[it.t]+' — '+it.lab+'</b>'+(it.res?'<span class="res"><b>Result:</b> '+it.res+'</span>':'')+'<span class="why">'+it.why+'</span>';
+      fb.appendChild(d); });
+    const missed=S.items.map((it,i)=>({it,i})).filter(o=>o.it.t==='g' && !sel.includes(o.i));
+    if(missed.length){ const d=document.createElement('div'); d.className='fb n';
+      d.innerHTML='<b class="t">Strong choices you did not take</b>'+missed.map(o=>'<span class="why"><b>'+o.it.lab+'.</b> '+(o.it.res?'Result: '+o.it.res+' ':'')+o.it.why+'</span>').join('');
+      fb.appendChild(d); }
+    stage.appendChild(fb);
+    const last = si===C.stages.length-1;
+    actions([[last?'See your summary':'Continue',()=>{si++;render();window.scrollTo(0,0);}]], true);
+  }
+}
+function actions(list, enabled, withBack){
+  const a=document.createElement('div'); a.className='act';
+  list.forEach(([lab,fn])=>{const b=document.createElement('button'); b.className='go'; b.textContent=lab; b.disabled=!enabled; b.onclick=fn; a.appendChild(b);});
+  const back=document.createElement('button'); back.className='go ghost'; back.textContent='Back to all cases'; back.onclick=()=>{menu();window.scrollTo(0,0);}; a.appendChild(back);
+  stage.appendChild(a);
+}
+function renderSummary(){
+  HS.textContent='Summary of your case.';
+  const h=document.createElement('h2'); h.textContent='Your summary'; stage.appendChild(h);
+  let g=0,y=0,r=0;
+  C.stages.forEach(S=>(picks[S.key]||[]).forEach(i=>{const t=S.items[i].t; if(t==='g')g++; else if(t==='y')y++; else r++;}));
+  const tl=document.createElement('div'); tl.className='tally';
+  tl.innerHTML='<div class="g"><span>'+g+'</span>strong</div><div class="y"><span>'+y+'</span>acceptable</div><div class="r"><span>'+r+'</span>not advised</div>';
+  stage.appendChild(tl);
+  const box=document.createElement('div'); box.className='sumsec';
+  C.stages.forEach(S=>{
+    const h3=document.createElement('h3'); h3.textContent=S.lab+' — '+S.task; box.appendChild(h3);
+    (picks[S.key]||[]).forEach(i=>{const it=S.items[i]; const d=document.createElement('div'); d.className='fb '+it.t;
+      d.innerHTML='<b class="t">'+TIER[it.t]+' — '+it.lab+'</b><span class="why">'+it.why+'</span>'; box.appendChild(d);});
+  });
+  stage.appendChild(box);
+  const disc=document.createElement('div'); disc.className='disc';
+  disc.innerHTML='<h3>Worth thinking about</h3><ul>'+C.discuss.map(([q,a])=>'<li>'+q+'<details style="margin-top:4px"><summary style="cursor:pointer;color:#7FC4D6;font-size:13px">Show a strong answer</summary><div style="font-size:13.5px;margin-top:4px;opacity:.95">'+a+'</div></details></li>').join('')+'</ul>';
+  stage.appendChild(disc);
+  const a=document.createElement('div'); a.className='act';
+  const n=document.createElement('button'); n.className='go'; n.textContent='Choose another case'; n.onclick=()=>{menu();window.scrollTo(0,0);}; a.appendChild(n);
+  const p=document.createElement('button'); p.className='go ghost'; p.textContent='Print for your own notes'; p.onclick=()=>window.print(); a.appendChild(p);
+  stage.appendChild(a);
+}
+menu();
+</script>
+</body>
+</html>
